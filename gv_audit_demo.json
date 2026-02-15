@@ -1,0 +1,83 @@
+{
+  "audit_log": [],
+  "analysis_history": [
+    {
+      "local_score": 1751.45,
+      "pri": 0.92,
+      "caf": 0.88,
+      "spc": 0.75,
+      "gis": 8760.73,
+      "project_name": "Cosmic Education Platform",
+      "creator_name": "Alice Smith",
+      "domain": "Education",
+      "timestamp": "2026-01-27T18:16:26.993546"
+    },
+    {
+      "local_score": 1240.3,
+      "pri": 0.85,
+      "caf": 0.92,
+      "spc": 0.88,
+      "gis": 8560.15,
+      "project_name": "Bioenenergy Microgrids",
+      "creator_name": "Bob Johnson",
+      "domain": "Ecology",
+      "timestamp": "2026-01-27T18:16:26.997545"
+    },
+    {
+      "local_score": 1751.45,
+      "pri": 0.92,
+      "caf": 0.88,
+      "spc": 0.75,
+      "gis": 8760.73,
+      "project_name": "Cosmic Education",
+      "creator_name": "Anonymous",
+      "domain": "Education",
+      "timestamp": "2026-01-27T18:16:27.003451"
+    },
+    {
+      "local_score": 1240.3,
+      "pri": 0.85,
+      "caf": 0.92,
+      "spc": 0.88,
+      "gis": 8560.15,
+      "project_name": "Bioenenergy",
+      "creator_name": "Anonymous",
+      "domain": "Ecology",
+      "timestamp": "2026-01-27T18:16:27.003497"
+    },
+    {
+      "local_score": 980.5,
+      "pri": 0.88,
+      "caf": 0.72,
+      "spc": 0.65,
+      "gis": 7505.25,
+      "project_name": "Cultural Resonance",
+      "creator_name": "Anonymous",
+      "domain": "Culture",
+      "timestamp": "2026-01-27T18:16:27.003515"
+    },
+    {
+      "local_score": 1500.2,
+      "pri": 0.75,
+      "caf": 0.8,
+      "spc": 0.7,
+      "gis": 7600.1,
+      "project_name": "FinTech for Good",
+      "creator_name": "Anonymous",
+      "domain": "Finance",
+      "timestamp": "2026-01-27T18:16:27.003531"
+    },
+    {
+      "local_score": 1100.0,
+      "pri": 0.7,
+      "caf": 0.65,
+      "spc": 0.6,
+      "gis": 6525.0,
+      "project_name": "Health Tech Startup",
+      "creator_name": "Anonymous",
+      "domain": "Health",
+      "timestamp": "2026-01-27T18:16:27.003545"
+    }
+  ],
+  "export_timestamp": "2026-01-27T18:16:27.394967"
+}

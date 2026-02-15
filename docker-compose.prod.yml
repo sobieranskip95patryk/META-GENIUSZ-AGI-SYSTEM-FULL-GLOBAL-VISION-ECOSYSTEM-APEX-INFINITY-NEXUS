@@ -1,0 +1,154 @@
+# Production Docker Compose file for GOK:AI
+# Purpose: Production environment with GCP Cloud SQL, Cloud Storage, Firestore
+# Note: Requires GCP credentials and proper configuration
+
+version: '3.8'
+
+services:
+  # Main GOK:AI Application (Production)
+  gok-app:
+    image: ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT}/gok-ai/gok-ai:${APP_VERSION}
+    container_name: gok-ai-prod
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONIOENCODING: utf-8
+      ENVIRONMENT: production
+      LOG_LEVEL: INFO
+      
+      # GCP Configuration
+      GCP_PROJECT: ${GCP_PROJECT}
+      GCP_REGION: ${GCP_REGION}
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/gcp-key.json
+      
+      # Database Configuration
+      CLOUD_SQL_INSTANCE: ${CLOUD_SQL_INSTANCE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      
+      # Cache Configuration
+      REDIS_URL: ${REDIS_URL}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      
+      # Service URLs
+      MTAQUEST_SERVER_URL: http://mtaquest-server:5000
+      API_SERVER_URL: http://api-gateway:8000
+      
+      # Feature Flags
+      ENABLE_LOGGING: 'true'
+      ENABLE_MONITORING: 'true'
+      ENABLE_TRACING: 'true'
+      
+    volumes:
+      - /secrets/gcp-key.json:/secrets/gcp-key.json:ro
+      - ./logs:/app/logs
+    networks:
+      - gok-prod-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - mtaquest-server
+      - api-gateway
+    logging:
+      driver: "gcplogs"
+      options:
+        gcp-project: ${GCP_PROJECT}
+
+  # MTaQuest Server (Production)
+  mtaquest-server:
+    image: ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT}/gok-ai/gok-ai-mtaquest:${APP_VERSION}
+    container_name: gok-mtaquest-prod
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+      PYTHONUNBUFFERED: 1
+      PYTHONIOENCODING: utf-8
+      
+      # GCP Configuration
+      GCP_PROJECT: ${GCP_PROJECT}
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/gcp-key.json
+      
+      # Database Configuration
+      NEO4J_URI: ${NEO4J_URI}
+      NEO4J_USER: ${NEO4J_USER}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      
+      # Performance Tuning
+      WORKERS: 4
+      WORKER_CLASS: gevent
+      
+    volumes:
+      - /secrets/gcp-key.json:/secrets/gcp-key.json:ro
+      - ./logs:/app/logs
+    networks:
+      - gok-prod-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "gcplogs"
+      options:
+        gcp-project: ${GCP_PROJECT}
+
+  # API Gateway (Production)
+  api-gateway:
+    image: ${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT}/gok-ai/gok-ai-api:${APP_VERSION}
+    container_name: gok-api-prod
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONIOENCODING: utf-8
+      ENVIRONMENT: production
+      
+      # GCP Configuration
+      GCP_PROJECT: ${GCP_PROJECT}
+      GOOGLE_APPLICATION_CREDENTIALS: /secrets/gcp-key.json
+      
+      # Service URL
+      MTAQUEST_SERVER_URL: http://mtaquest-server:5000
+      
+      # Performance Tuning
+      WORKERS: 4
+      
+    volumes:
+      - /secrets/gcp-key.json:/secrets/gcp-key.json:ro
+      - ./logs:/app/logs
+    networks:
+      - gok-prod-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "gcplogs"
+      options:
+        gcp-project: ${GCP_PROJECT}
+
+volumes:
+  logs:
+    driver: local
+
+networks:
+  gok-prod-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -1,0 +1,28 @@
+{
+  "module": "ASQK-7G",
+  "version": "2.0.0",
+  "type": "core-synth",
+  "description": "Wektorowy syntezer 7G — normalizacja + skala ×7",
+  "inputs": {
+    "query_vector": "list<float>",
+    "weights": "list<float> | optional",
+    "bias": "float | optional",
+    "adaptive": "bool | optional"
+  },
+  "outputs": {
+    "status": "string",
+    "score": "float"
+  },
+  "pipeline": [
+    "validate.vector",
+    "compute.weighted_sum",
+    "compute.weighted_mean",
+    "scale.7g",
+    "emit.response"
+  ],
+  "compatibility": {
+    "projectvector": "1.0",
+    "globalvision": "1.1",
+    "orchestrator": "2.0"
+  }
+}

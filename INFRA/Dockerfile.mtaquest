@@ -1,0 +1,43 @@
+# Dockerfile for MTaQuest Integration
+# Purpose: Containerize MTaQuest Server (HDP + IQE + VSE)
+# Base: Python 3.10-slim
+
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy MTaQuest requirements
+COPY MTAQUEST/requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy MTaQuest module
+COPY MTAQUEST/ MTAQUEST/
+COPY CORE/ CORE/
+COPY INFRA/ INFRA/
+COPY CONFIG/ CONFIG/
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONIOENCODING=utf-8
+ENV FLASK_APP=INFRA/Services/mtaquest_server.py
+ENV FLASK_ENV=development
+
+# Expose port
+EXPOSE 5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:5000/health || exit 1
+
+# Run MTaQuest server
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]

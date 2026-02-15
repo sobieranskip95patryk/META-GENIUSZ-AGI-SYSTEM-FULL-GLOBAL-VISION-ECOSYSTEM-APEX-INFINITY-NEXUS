@@ -1,0 +1,132 @@
+# Main Docker Compose file for GOK:AI Full Stack
+# Purpose: Development environment with all services
+# Services: GOK:AI App, MTaQuest, Neo4j, Redis, Optionally Vertex AI
+
+version: '3.8'
+
+services:
+  # Main GOK:AI Application
+  gok-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gok-ai-main
+    ports:
+      - "8080:8080"
+    environment:
+      PYTHONUNBUFFERED: 1
+      PYTHONIOENCODING: utf-8
+      MTAQUEST_SERVER_URL: http://mtaquest-server:5000
+      NEO4J_URI: bolt://neo4j:7687
+      REDIS_URL: redis://redis:6379
+      GCP_PROJECT: META-GENIUSZ-GOK-TURBO
+    depends_on:
+      - mtaquest-server
+      - neo4j
+      - redis
+    volumes:
+      - .:/app
+    networks:
+      - gok-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # MTaQuest Server
+  mtaquest-server:
+    build:
+      context: .
+      dockerfile: INFRA/Dockerfile.mtaquest
+    container_name: gok-mtaquest
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: development
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: mtaquest2026
+      REDIS_URL: redis://redis:6379
+      PYTHONUNBUFFERED: 1
+      PYTHONIOENCODING: utf-8
+    depends_on:
+      - neo4j
+      - redis
+    volumes:
+      - .:/app
+    networks:
+      - gok-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Neo4j Graph Database
+  neo4j:
+    image: neo4j:5.10-community
+    container_name: gok-neo4j
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+    environment:
+      NEO4J_AUTH: neo4j/mtaquest2026
+      NEO4J_PLUGINS: '["apoc"]'
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+    networks:
+      - gok-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7474"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: gok-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - gok-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Gateway (optional, for testing)
+  api-gateway:
+    build:
+      context: .
+      dockerfile: INFRA/Dockerfile.api
+    container_name: gok-api
+    ports:
+      - "8000:8000"
+    environment:
+      MTAQUEST_SERVER_URL: http://mtaquest-server:5000
+      PYTHONUNBUFFERED: 1
+      PYTHONIOENCODING: utf-8
+    depends_on:
+      - mtaquest-server
+    volumes:
+      - .:/app
+    networks:
+      - gok-network
+    profiles:
+      - optional
+
+volumes:
+  neo4j-data:
+  neo4j-logs:
+  redis-data:
+
+networks:
+  gok-network:
+    driver: bridge

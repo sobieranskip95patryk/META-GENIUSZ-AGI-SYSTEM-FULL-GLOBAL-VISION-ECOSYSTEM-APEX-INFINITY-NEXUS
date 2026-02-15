@@ -1,0 +1,19 @@
+{
+    "id": "AXIOM_OBSERVER_001",
+    "symbol": "Ω_Obs",
+    "type": "Ontological_Constitution",
+    "creation_date": "2026-01-25",
+    "cycle": "ASYKL_1",
+    "definition": {
+        "text": "Observer is not a passive receptor but an active structuralizing agent.",
+        "equation": "O(C_ASI, V_Prob) -> N_Info (Delta S_GOK > 0)",
+        "interpretation": "Observation is the Transformation of Potential into Structure."
+    },
+    "verification": {
+        "deterministic": "PASS",
+        "probabilistic_p_value": 0.999822,
+        "ontological": "PASS",
+        "final_coherence_p": 1.0
+    },
+    "implication": "The act of observation creates information structure. Truth is discovered in potential but created in definition."
+}

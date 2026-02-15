@@ -1,0 +1,29 @@
+{
+  "module": "ASQK-META",
+  "version": "1.0.0",
+  "type": "meta-synth",
+  "description": "Meta-synteza wielu wektorów ASQK w jeden meta-wektor trendów",
+  "inputs": {
+    "vectors": "list<list<float>>",
+    "weights": "list<float> | optional",
+    "mode": "string | optional ('mean' | 'energy' | 'trend')"
+  },
+  "outputs": {
+    "status": "string",
+    "meta_score": "float",
+    "meta_vector": "list<float>"
+  },
+  "pipeline": [
+    "validate.vectors",
+    "normalize.vectors",
+    "aggregate.meta",
+    "compute.meta_score",
+    "emit.response"
+  ],
+  "compatibility": {
+    "projectvector": "1.0",
+    "globalvision": "1.1",
+    "orchestrator": "2.0",
+    "asqk_7g": "2.0"
+  }
+}

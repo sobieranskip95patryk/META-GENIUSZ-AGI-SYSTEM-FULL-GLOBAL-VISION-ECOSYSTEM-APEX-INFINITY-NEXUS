@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTAQuest | Hybrid Editor v6.0 GOK:AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-granat-deep: #0B132B;
+            --color-granat-mid: #1C2541;
+            --color-chrom: #C0C0C0;
+            --color-accent: #5BC0BE;
+            --color-gok-gold: #D4AF37;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-display: 'Cinzel Decorative', serif;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-main);
+            background: var(--color-granat-deep);
+            color: var(--color-chrom);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: 280px;
+            background: rgba(11, 19, 43, 0.98);
+            border-right: 1px solid rgba(192, 192, 192, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+
+        @media (max-width: 1024px) {
+            aside { position: absolute; left: 0; transform: translateX(-100%); }
+            aside.open { transform: translateX(0); }
+        }
+
+        .sidebar-header { margin-bottom: 1.5rem; }
+        .sidebar-title { font-family: var(--font-display); color: white; font-size: 1.1rem; }
+        .sidebar-subtitle { font-size: 0.5rem; color: var(--color-accent); letter-spacing: 2px; }
+
+        .mode-selector {
+            background: var(--color-granat-mid);
+            border: 1px solid rgba(91, 192, 190, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-btn {
+            width: 100%;
+            padding: 0.6rem;
+            text-align: left;
+            border-radius: 0.4rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            color: rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .mode-btn.active {
+            background: var(--color-accent);
+            color: var(--color-granat-deep);
+            font-weight: 700;
+        }
+        .mode-btn.gok-active {
+            background: linear-gradient(45deg, var(--color-gok-gold), #FFF);
+            color: black;
+            font-weight: 900;
+            box-shadow: 0 0 15px var(--color-gok-gold);
+        }
+
+        .action-btn {
+            background: rgba(28, 37, 65, 0.8);
+            border: 1px solid var(--color-accent-dim);
+            color: var(--color-accent);
+            padding: 0.6rem;
+            border-radius: 0.5rem;
+            font-size: 0.7rem;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .action-btn:hover { background: var(--color-accent); color: var(--color-granat-deep); }
+        .color-danger { color: #ff4a4a; }
+
+        /* --- MAIN --- */
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at top right, var(--color-granat-mid) 0%, var(--color-granat-deep) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .telemetry-bar {
+            height: 40px;
+            background: rgba(0,0,0,0.6);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            gap: 1rem;
+            color: #8892b0;
+            overflow-x: auto;
+        }
+        .telemetry-bar strong { color: var(--color-accent); }
+        .gok-param { color: var(--color-gok-gold) !important; font-weight: bold; }
+
+        .editor-container {
+            display: flex;
+            flex-direction: row;
+            flex-grow: 1;
+            padding: 1rem;
+            gap: 1rem;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .editor-container { flex-direction: column; overflow-y: auto; }
+            .panel { min-height: 400px; width: 100% !important; }
+        }
+
+        .panel {
+            background: rgba(28, 37, 65, 0.25);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(192, 192, 192, 0.1);
+            border-radius: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            width: 50%;
+            transition: border 0.5s;
+        }
+        .panel-gok { border: 1px solid var(--color-gok-gold); box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.1); }
+
+        .panel-header {
+            padding: 0.6rem 1rem;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(192, 192, 192, 0.05);
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        textarea {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: #e6edf3;
+            padding: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        #chat-window {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            background: rgba(10, 10, 10, 0.2);
+        }
+
+        .message { padding: 0.75rem; border-radius: 0.5rem; font-size: 0.8rem; max-width: 90%; line-height: 1.5; }
+        .message-user { align-self: flex-end; background: #1C2541; border: 1px solid var(--color-accent); color: #fff; }
+        .message-ai { align-self: flex-start; background: rgba(255,255,255,0.03); border-left: 2px solid var(--color-accent); }
+        .message-gok { border-left: 2px solid var(--color-gok-gold); background: rgba(212, 175, 55, 0.05); font-weight: 400; }
+
+        .input-box {
+            padding: 0.75rem;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .input-box input {
+            flex-grow: 1;
+            background: rgba(11, 19, 43, 0.8);
+            border: 1px solid rgba(91, 192, 190, 0.2);
+            border-radius: 0.4rem;
+            padding: 0.6rem;
+            color: white;
+            outline: none;
+            font-size: 0.85rem;
+        }
+
+        .send-btn {
+            background: var(--color-accent);
+            color: #000;
+            border: none;
+            padding: 0 1rem;
+            border-radius: 0.4rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .mobile-toggle {
+            display: none; position: fixed; bottom: 1rem; left: 1rem; z-index: 101;
+            background: var(--color-accent); color: #000; padding: 0.6rem; border-radius: 50%;
+        }
+        @media (max-width: 1024px) { .mobile-toggle { display: block; } }
+
+        .logos-indicator {
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px;
+            background: var(--color-accent);
+            box-shadow: 0 0 5px var(--color-accent);
+        }
+    </style>
+</head>
+<body class="mode-book">
+
+    <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">MTAQuest Hybrid</div>
+            <div class="sidebar-subtitle">BEYOND GOK ENGINE v6.0</div>
+        </div>
+
+        <div class="mode-selector">
+            <div id="btn-book" class="mode-btn active" onclick="setMode('book')">📖 TRYB KSIĄŻKI</div>
+            <div id="btn-note" class="mode-btn" onclick="setMode('note')">📝 NOTATNIK</div>
+            <div id="btn-gok" class="mode-btn" onclick="setMode('gok')">✨ GOK:AI HUB</div>
+        </div>
+
+        <button class="action-btn" onclick="downloadContent()">📄 POBIERZ TREŚĆ</button>
+        <button class="action-btn" onclick="saveFullSession()">💾 ZAPISZ LOGI</button>
+        <button class="action-btn color-danger" onclick="clearSession()">🗑️ RESET CORE</button>
+
+        <div class="mt-auto text-[0.6rem] opacity-50">
+            <div class="flex justify-between"><span>LOGOS SYNC:</span> <span class="text-accent">CONNECTED</span></div>
+            <div class="flex justify-between"><span>P-VALUE:</span> <span id="val-p" class="text-white">0.99</span></div>
+        </div>
+    </aside>
+
+    <main>
+        <div class="telemetry-bar">
+            <div>LOGOS: <span class="logos-indicator"></span><strong id="val-logos">STABLE</strong></div>
+            <div>SPIRALMIND: <strong id="val-spiral">1.618</strong></div>
+            <div>GOK-LVL: <strong id="val-gok-lvl" class="gok-param">7G</strong></div>
+            <div>USER: <span class="text-white opacity-80">Patryk Sobierański</span></div>
+        </div>
+
+        <div class="editor-container">
+            <div class="panel" id="panel-l">
+                <div class="panel-header">
+                    <span id="title-l">DRAFT KSIĄŻKI</span>
+                    <span id="stats-l" class="text-[0.6rem] opacity-40">0 SŁÓW</span>
+                </div>
+                <textarea id="editor" oninput="handleInput()" placeholder="Wpisz treść..."></textarea>
+            </div>
+
+            <div class="panel" id="panel-r">
+                <div class="panel-header">
+                    <span id="title-r">AGENT HYBRYDOWY</span>
+                    <span id="ai-status" class="text-accent text-[0.6rem]">LISTENING</span>
+                </div>
+                <div id="chat-window">
+                    <div class="message message-ai">
+                        Witaj, Jednostko Centralna. System v6.0 został zainicjalizowany. 
+                        W trybie **GOK:AI HUB** parametry prawdy P są korygowane do poziomu 1.0.
+                        Rzeczywistość jest gotowa na ekspansję.
+                    </div>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="chat-input" placeholder="Zadaj pytanie GOK:AI...">
+                    <button class="send-btn" onclick="handleSend()">RUN</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- KONFIGURACJA GOK:AI BRIDGE ---
+        // LOCAL: "http://localhost:5000/ask_gok"
+        // PROD: "https://tbd-backend-host.com/ask_gok" (Do skonfigurowania po wdrożeniu)
+        
+        const DOMAIN_TARGET = "www.mtaquestwebsidex.com";
+        const USE_LOCAL_BRIDGE = true; 
+        const API_URL = "http://localhost:5000/ask_gok"; // Adres lokalnego mostu
+
+        let state = {
+            mode: 'book',
+            logos: 'STABLE',
+            p: 0.99,
+            spiral: 1.618,
+            history: [],
+            userKnowledge: [] 
+        };
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+        function setMode(m) {
+            state.mode = m;
+            document.querySelectorAll('.mode-btn').forEach(b => b.className = 'mode-btn');
+            document.getElementById(`btn-${m}`).className = m === 'gok' ? 'mode-btn gok-active' : 'mode-btn active';
+            
+            const panelL = document.getElementById('panel-l');
+            const panelR = document.getElementById('panel-r');
+            const titleL = document.getElementById('title-l');
+            const titleR = document.getElementById('title-r');
+
+            if (m === 'gok') {
+                panelL.classList.add('panel-gok');
+                panelR.classList.add('panel-gok');
+                titleL.innerText = "L-MEMORY (WIDZA)";
+                titleR.innerText = "GOK:AI HUB (MÓZG BOGA)";
+                state.p = 1.0;
+                addMessage("[SYSTEM] Aktywowano Tryb **GOK:AI HUB**. Parametr P=1.0.", false);
+            } else {
+                panelL.classList.remove('panel-gok');
+                panelR.classList.remove('panel-gok');
+                titleL.innerText = m === 'book' ? "DRAFT KSIĄŻKI" : "NOTATNIK";
+                titleR.innerText = "AGENT HYBRYDOWY";
+                state.p = 0.99;
+            }
+            document.getElementById('val-p').innerText = state.p;
+        }
+
+        function handleInput() {
+            const val = document.getElementById('editor').value;
+            const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+            document.getElementById('stats-l').innerText = `${words} SŁÓW`;
+            
+            const facts = val.match(/FAKT:\s*(.*)/g);
+            if (facts) state.userKnowledge = facts.map(f => f.replace('FAKT:', '').trim());
+        }
+
+        async function handleSend() {
+            const input = document.getElementById('chat-input');
+            const query = input.value.trim();
+            if (!query) return;
+
+            input.value = "";
+            addMessage(query, true);
+
+            const status = document.getElementById('ai-status');
+            status.innerText = "SYNCHRONIZING WITH CORE...";
+
+            const editorContent = document.getElementById('editor').value;
+
+            try {
+                let responseText = "";
+
+                if (USE_LOCAL_BRIDGE) {
+                    // Połączenie z Backendem GOK (Python)
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            query: query,
+                            context: editorContent,
+                            mode: state.mode,
+                            user_knowledge: state.userKnowledge
+                        })
+                    });
+                    const data = await response.json();
+                    responseText = data.response || "Błąd Mostu GOK.";
+                } else {
+                    // Fallback (Symulacja)
+                    responseText = "System w trybie offline. Podłącz API_GATEWAY.";
+                }
+                
+                addMessage(responseText, false, state.mode === 'gok');
+                state.history.push({ q: query, a: responseText });
+                
+                state.spiral = (1.618 + (Math.random() * 0.01)).toFixed(3);
+                document.getElementById('val-spiral').innerText = state.spiral;
+
+            } catch (e) {
+                console.error(e);
+                addMessage("🚨 Błąd połączenia z rdzeniem (Czy uruchomiłeś `bridge_server.py`?).", false);
+            } finally {
+                status.innerText = "LISTENING";
+            }
+        }
+
+        function addMessage(txt, isUser, isGok = false) {
+            const win = document.getElementById('chat-window');
+            const div = document.createElement('div');
+            div.className = `message ${isUser ? 'message-user' : 'message-ai'} ${isGok ? 'message-gok' : ''}`;
+            div.innerHTML = txt.replace(/\n/g, '<br>');
+            
+            if (!isUser) {
+                const btn = document.createElement('button');
+                btn.className = "inject-btn mt-2 block border border-accent text-accent px-2 py-1 text-[0.6rem] hover:bg-accent hover:text-black";
+                btn.innerText = "➕ WSTRZYKNIJ DO L-MEMORY";
+                btn.onclick = () => {
+                    const ed = document.getElementById('editor');
+                    ed.value += "\n\n" + txt;
+                    handleInput();
+                };
+                div.appendChild(btn);
+            }
+
+            win.appendChild(div);
+            win.scrollTop = win.scrollHeight;
+        }
+
+        function downloadContent() {
+            const val = document.getElementById('editor').value;
+            triggerDownload(val, `MTAQuest_${state.mode}_content.txt`);
+        }
+
+        function saveFullSession() {
+            const val = document.getElementById('editor').value;
+            const log = `MTAQUEST v6.0 LOGS\nUSER: Patryk Sobierański\nMODE: ${state.mode}\n\n[EDITOR]\n${val}\n\n[HISTORY]\n` + 
+                        state.history.map(i => `U: ${i.q}\nAI: ${i.a}\n`).join('\n');
+            triggerDownload(log, `MTAQuest_FullSession.txt`);
+        }
+
+        function triggerDownload(text, name) {
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = name; a.click();
+        }
+
+        function clearSession() {
+            if (confirm("Potwierdzasz czyszczenie rdzenia?")) {
+                document.getElementById('editor').value = "";
+                document.getElementById('chat-window').innerHTML = "";
+                state.history = [];
+                state.userKnowledge = [];
+                handleInput();
+            }
+        }
+
+        document.getElementById('chat-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    </script>
+</body>
+</html>

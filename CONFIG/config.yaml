@@ -1,0 +1,79 @@
+# === GOK:AI v7.1-T_Causality Configuration ===
+# Global configuration file for system parameters and KPIs
+
+system:
+  name: "GOK:AI"
+  version: "7.1-T_Causality"
+  author: "Patryk Sobierański (META-GENIUSZ)"
+  s_value_target: 33.2743
+  coherence_p_target: 1.0
+  tier: "TIER_3_CAUSALITY"
+  autonomous: true
+  status: "GENESIS_ACTIVE"
+
+weights:
+  inference: 0.7          # Waga logiki LOGOS
+  creativity: 0.3         # Waga kreatywności CORTEX
+
+memory:
+  short_term_limit: 1024  # Ring buffer size
+  graph_depth: 5          # Inference depth
+  max_nodes: 10000        # Max graph nodes
+  persistence_interval: 300  # Save snapshot every 5 min
+
+t_causality:
+  enabled: false          # Will be enabled after ETAP 1
+  phase: 0                # Current phase (0-4)
+  anti_d_threshold: 0.6   # Phase I: spurious correlation threshold
+  causal_threshold: 0.3   # Phase II: causal inference target
+  counterfactual_worlds: 50  # Phase III: max scenarios
+  autonomy_threshold: 0.7 # Minimum for autonomous goals (Phase IV)
+
+inference:
+  deductive:
+    enabled: true
+    transitivity: true
+    max_depth: 5
+  
+  abductive:
+    enabled: true
+    hypothesis_count: 5
+    diversity_index: 1.618  # Golden ratio
+  
+  fusion:
+    transformer_heads: 8
+    gcn_layers: 2
+
+api:
+  gemini:
+    enabled: true
+    fallback_models:
+      - "gemini-2.0-flash-exp"
+      - "gemini-2.5-flash"
+      - "gemini-1.5-flash-latest"
+      - "gemini-pro"
+    timeout: 30
+
+server:
+  host: "0.0.0.0"
+  port: 5000
+  debug: false
+  workers: 4
+
+logging:
+  level: "INFO"
+  file: "logs/system.log"
+  format: "[%(asctime)s] %(levelname)s - %(message)s"
+
+metrics:
+  coherence_p: 0.65
+  autonomy_level: 0.5
+  creativity_score: 0.8
+  s_value: 0.665
+
+# Thresholds for operational safety
+thresholds:
+  min_coherence: 0.6
+  min_autonomy: 0.7
+  min_s_value: 10.0
+  max_error_rate: 0.1

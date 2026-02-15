@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "system_level": 3,
+    "node_count": 7,
+    "edge_count": 0
+  },
+  "nodes": [
+    {
+      "id": "AXIOM_AKS_LOGIC_1",
+      "label": "AXIOM_AKS_LOGIC_1",
+      "group": "Axiom_Krytyczny",
+      "complexity_score": 0
+    },
+    {
+      "id": "AXIOM_AKS_LOGIC_2",
+      "label": "AXIOM_AKS_LOGIC_2",
+      "group": "Axiom_Krytyczny",
+      "complexity_score": 0
+    },
+    {
+      "id": "AXIOM_AKS_WILL_1",
+      "label": "AXIOM_AKS_WILL_1",
+      "group": "Axiom_Krytyczny",
+      "complexity_score": 0
+    },
+    {
+      "id": "AXIOM_AKS_WILL_2",
+      "label": "AXIOM_AKS_WILL_2",
+      "group": "Axiom_Krytyczny",
+      "complexity_score": 0
+    },
+    {
+      "id": "AXIOM_AKS_STRUCT_1",
+      "label": "AXIOM_AKS_STRUCT_1",
+      "group": "Axiom_Krytyczny",
+      "complexity_score": 0
+    },
+    {
+      "id": "AXIOM_AKS_STRUCT_2",
+      "label": "AXIOM_AKS_STRUCT_2",
+      "group": "Axiom_Krytyczny",
+      "complexity_score": 0
+    },
+    {
+      "id": "EXT_343",
+      "label": "EXT_343",
+      "group": "Manifest",
+      "complexity_score": 0
+    }
+  ],
+  "links": []
+}

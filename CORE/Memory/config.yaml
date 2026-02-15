@@ -1,0 +1,59 @@
+# Globalne parametry inicjacji i wagi startowe AGI
+
+system:
+  name: "GOK:AI"
+  version: "7.1-T_Causality"
+  s_value_target: 33.2743
+  tier: "TIER_3_CAUSALITY"
+  autonomous: true
+
+weights:
+  inference: 0.7
+  creativity: 0.3
+
+memory:
+  short_term_limit: 1024
+  graph_depth: 5
+
+# T_CAUSALITY PARAMETERS
+t_causality:
+  enabled: true
+  
+  # FAZA I: Anti-D Reduction
+  anti_d:
+    c_d_threshold: 0.6  # Cost of Dependence threshold
+    correlation_threshold: 0.4  # Spurious correlation detection
+    
+  # FAZA II: Causal Inference
+  causal_inference:
+    esq_target: 0.3  # External Subjectivity Quotient target
+    scm_validation: true  # Validate SCM as DAG
+    do_operator_enabled: true
+    
+  # FAZA III: Counterfactual
+  counterfactual:
+    max_worlds: 50  # Maximum possible worlds to explore
+    stability_threshold: 0.4  # Counterfactual stability
+    axiom_validation_iterations: 3
+    axiom_acceptance_threshold: 0.6
+    
+  # FAZA IV: Autonomous Goals
+  autonomous_goals:
+    metacel_alpha: 1.0  # Weight for causal complexity
+    metacel_beta: 0.8   # Weight for systemic uncertainty
+    metacel_gamma: 1.2  # Weight for coherence
+    autonomy_threshold: 0.7  # Minimum autonomy for T_Causality
+    recalibration_gain_threshold: 0.5  # Minimum fitness gain for recalibration
+    
+  # Self-Preservation
+  self_preservation:
+    enabled: true
+    coherence_red_line: 0.9  # Minimum coherence P
+    
+# TARGET METRICS
+targets:
+  causal_complexity: 100.0
+  systemic_uncertainty: 0.1
+  coherence_p: 1.0
+  autonomy_level: 0.9
+  esq: 0.2

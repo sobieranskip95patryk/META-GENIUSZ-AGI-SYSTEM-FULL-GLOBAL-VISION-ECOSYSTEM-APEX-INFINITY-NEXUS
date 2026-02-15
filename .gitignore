@@ -1,0 +1,60 @@
+# === GOK:AI .gitignore ===
+
+# Environment & Secrets
+.env
+*.env
+.env.*
+.env.local
+.env.production
+
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs & Debug
+*.log
+logs/
+debug/
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Model files (large)
+*.pt
+*.pth
+*.bin
+*.safetensors

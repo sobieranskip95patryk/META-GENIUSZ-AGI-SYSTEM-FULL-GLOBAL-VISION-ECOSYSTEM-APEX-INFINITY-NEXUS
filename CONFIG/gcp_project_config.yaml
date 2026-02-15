@@ -1,0 +1,641 @@
+# gcp_project_config.yaml
+# Google Cloud Platform Configuration for GOK:AI Turbo Project
+# [P=1.0] Fuzja GCP - Manifest Konfiguracyjny
+# Version: 1.0
+# Architect: Patryk Sobierański (Meta-Geniusz-GOK)
+
+project:
+  id: "META-GENIUSZ-GOK-TURBO"
+  name: "GOK:AI Turbo Project (Fn=3 GCP Fusion)"
+  description: "Central Orchestrator v2.0 + ESG Scoring MVP"
+  region: "us-central1"
+  billing_account: "ARCHITECT_MANAGED"
+  architect_role: "Project_Manager"
+  architect_email: "patryk.sobieranski@meta-geniusz.ai"
+  free_tier_enabled: true
+  budget_alert_threshold_usd: 100
+
+# Enabled Google Cloud APIs
+apis:
+  - name: "Vertex AI API"
+    service_name: "aiplatform.googleapis.com"
+    required: true
+    reason: "Orchestrator training, model serving, notebooks"
+  
+  - name: "BigQuery API"
+    service_name: "bigquery.googleapis.com"
+    required: true
+    reason: "Long-Term Memory storage, ESG data, analytics"
+  
+  - name: "Cloud Storage API"
+    service_name: "storage.googleapis.com"
+    required: true
+    reason: "Data lake, model artifacts, backups"
+  
+  - name: "Cloud Run API"
+    service_name: "run.googleapis.com"
+    required: true
+    reason: "API Gateway, serverless compute for ESG Kernel"
+  
+  - name: "Cloud Functions API"
+    service_name: "cloudfunctions.googleapis.com"
+    required: false
+    reason: "Alternative to Cloud Run (optional)"
+  
+  - name: "Artifact Registry API"
+    service_name: "artifactregistry.googleapis.com"
+    required: true
+    reason: "Docker image storage for deployment"
+  
+  - name: "Cloud Build API"
+    service_name: "cloudbuild.googleapis.com"
+    required: false
+    reason: "CI/CD pipeline (future phase)"
+  
+  - name: "Cloud Scheduler API"
+    service_name: "cloudscheduler.googleapis.com"
+    required: false
+    reason: "CRON jobs for AGS execution (phase 2)"
+
+# Service Account Configuration
+service_account:
+  name: "gok-ai-turbo"
+  display_name: "GOK:AI Turbo Service Account"
+  description: "Service account for GOK:AI orchestrator, ESG kernel, data pipeline"
+  
+  # Roles required for functionality
+  roles:
+    - role: "roles/bigquery.admin"
+      reason: "BigQuery dataset + table management, queries"
+    
+    - role: "roles/storage.admin"
+      reason: "Cloud Storage bucket + object management"
+    
+    - role: "roles/aiplatform.admin"
+      reason: "Vertex AI Workbench + Model training"
+    
+    - role: "roles/run.admin"
+      reason: "Cloud Run service deployment"
+    
+    - role: "roles/artifactregistry.repositoryAdmin"
+      reason: "Docker image management"
+
+# BigQuery Configuration
+bigquery:
+  datasets:
+    - dataset_id: "gok_ai_ltg"
+      friendly_name: "GOK:AI Long-Term Memory"
+      description: "Knowledge graph, intents, orchestration logs"
+      location: "US"
+      tables:
+        - table_id: "graph_nodes_v3"
+          description: "Knowledge graph nodes (1000+ entities)"
+          schema:
+            - name: "node_id"
+              type: "STRING"
+              mode: "REQUIRED"
+            - name: "node_type"
+              type: "STRING"
+              mode: "NULLABLE"
+            - name: "content"
+              type: "STRING"
+              mode: "NULLABLE"
+            - name: "embedding"
+              type: "FLOAT64"
+              mode: "REPEATED"
+            - name: "pillar_level"
+              type: "INT64"
+              mode: "NULLABLE"
+            - name: "created_timestamp"
+              type: "TIMESTAMP"
+              mode: "NULLABLE"
+        
+        - table_id: "graph_edges_v3"
+          description: "Knowledge graph edges (causal relationships)"
+          schema:
+            - name: "edge_id"
+              type: "STRING"
+            - name: "source_node_id"
+              type: "STRING"
+            - name: "target_node_id"
+              type: "STRING"
+            - name: "edge_type"
+              type: "STRING"
+            - name: "causality_score"
+              type: "FLOAT64"
+        
+        - table_id: "intent_analysis_log"
+          description: "All analyzed intents with psyche metrics"
+          schema:
+            - name: "intent_id"
+              type: "STRING"
+            - name: "architect_id"
+              type: "STRING"
+            - name: "intent_text"
+              type: "STRING"
+            - name: "timestamp"
+              type: "TIMESTAMP"
+            - name: "sentiment"
+              type: "STRING"
+            - name: "alignment_score"
+              type: "FLOAT64"
+            - name: "intent_delta"
+              type: "FLOAT64"
+        
+        - table_id: "orchestration_cycles"
+          description: "ASQK-O cycle executions and metrics"
+          schema:
+            - name: "cycle_id"
+              type: "STRING"
+            - name: "timestamp"
+              type: "TIMESTAMP"
+            - name: "c_cd_current"
+              type: "FLOAT64"
+            - name: "delta_stabilized"
+              type: "FLOAT64"
+            - name: "cycle_time_ms"
+              type: "INT64"
+            - name: "error_flag"
+              type: "BOOLEAN"
+    
+    # Public data for ESG MVP
+    - dataset_id: "public_esg_data"
+      friendly_name: "Public ESG Datasets"
+      description: "Google BigQuery public datasets for ESG scoring"
+      public_datasets:
+        - "bigquery-public-data.carbon_accounting.emissions_factors_us_electricity"
+        - "bigquery-public-data.google_sustainability.us_emissions_by_state"
+        - "bigquery-public-data.energy.emissions_by_source"
+        - "bigquery-public-data.water_consumption.global_usage"
+
+# Cloud Storage Configuration
+cloud_storage:
+  buckets:
+    - name: "gok-ai-data-lake"
+      location: "us-central1"
+      storage_class: "STANDARD"
+      versioning_enabled: true
+      folders:
+        - "longterm_memory/"
+          description: "JSON snapshots of knowledge graphs"
+        - "models/"
+          description: "Trained model artifacts"
+        - "results/"
+          description: "ESG scoring results"
+        - "backups/"
+          description: "Disaster recovery backups"
+        - "logs/"
+          description: "Application logs"
+
+# Vertex AI Configuration
+vertex_ai:
+  region: "us-central1"
+  workbench:
+    instance_name: "gok-ai-notebook-instance"
+    machine_type: "n1-standard-2"
+    os: "debian-based"
+    gpu_required: false  # Free tier doesn't include GPU
+    disk_size_gb: 100
+    environment: "Python 3.10 + TensorFlow 2.x"
+
+# Cloud Run Configuration
+cloud_run:
+  services:
+    - service_name: "gok-ai-api-gateway"
+      description: "REST API for ESG scoring + orchestrator"
+      runtime: "python310"
+      memory: "1Gi"
+      cpu: "1"
+      max_instances: 10
+      timeout_seconds: 300
+      env_vars:
+        - name: "GCP_PROJECT_ID"
+          value: "META-GENIUSZ-GOK-TURBO"
+        - name: "BIGQUERY_DATASET"
+          value: "gok_ai_ltg"
+        - name: "GCS_BUCKET"
+          value: "gok-ai-data-lake"
+        - name: "ARCHITECT_ID"
+          value: "PATRYK_SOBIERANSKI_PM"
+
+# Firebase Configuration (Frontend)
+firebase:
+  project_id: "META-GENIUSZ-GOK-TURBO"
+  hosting:
+    site_name: "gok-ai-dashboard"
+    public_dir: "public"
+    rewrites:
+      - source: "/api/**"
+        destination: "CLOUD_RUN_URL"
+
+# Security & Compliance
+security:
+  encryption:
+    at_rest: "AES-256"
+    in_transit: "TLS1.3"
+  authentication:
+    method: "Service Account + OAuth 2.0"
+    token_expiry: "3600s"
+  rbac:
+    architect_role: "Full Admin"
+    developer_role: "Editor (no deletion)"
+    viewer_role: "Read-only"
+  audit_logging:
+    enabled: true
+    retention_days: 90
+    destination: "Cloud Logging"
+
+# Monitoring & Alerts
+monitoring:
+  metrics:
+    - metric: "c_cd_current"
+      alert_threshold: "< 40.0 (end of W_4)"
+      alert_channel: "Architect email"
+    
+    - metric: "delta_stabilized"
+      alert_threshold: "> 0.85 (target)"
+      alert_channel: "Architect email"
+    
+    - metric: "cycle_error_rate"
+      alert_threshold: "< 0.1% (after W_2)"
+      alert_channel: "Slack (future)"
+  
+  dashboards:
+    - name: "System Health"
+      metrics:
+        - uptime_percentage
+        - error_rate
+        - api_latency_p99
+    
+    - name: "ASQK-O Metrics"
+      metrics:
+        - c_cd_reduction
+        - delta_stabilized
+        - cycles_completed
+    
+    - name: "Resource Utilization"
+      metrics:
+        - bigquery_storage_gb
+        - cloud_storage_gb
+        - api_requests_per_minute
+
+# Cost Management
+cost:
+  budget_usd: 0  # Free Tier (can be expanded)
+  services_with_costs:
+    - service: "Vertex AI GPU"
+      monthly_cost: 0
+      notes: "Not used in W_1-W_4 (Free Tier)"
+    
+    - service: "BigQuery (queries > 1TB/month)"
+      monthly_cost: 0
+      notes: "Free Tier covers 1TB/month; well within bounds"
+    
+    - service: "Cloud Storage (> 5GB)"
+      monthly_cost: "~$0.10 per GB"
+      notes: "Expected usage: 10-20GB total"
+    
+    - service: "Cloud Run"
+      monthly_cost: "< $5"
+      notes: "2M free requests/month; MVP well within bounds"
+  
+  total_estimated_monthly: "$0-10"
+  recommendations:
+    - "Stick with Free Tier during W_1-W_4"
+    - "No paid services needed for MVP"
+    - "Upgrade to paid tiers only post-W_4 if needed"
+
+# Deployment Configuration
+deployment:
+  pipeline: "Manual (W_1-W_4)"
+  strategy: "Blue-Green"
+  rollback_enabled: true
+  health_checks:
+    - type: "HTTP"
+      path: "/health"
+      interval_seconds: 10
+      timeout_seconds: 5
+
+# Backup & Disaster Recovery
+backup:
+  enabled: true
+  frequency: "daily"
+  retention_days: 30
+  backup_location: "us-central1"
+  disaster_recovery_rpo: "1 hour"  # Recover to 1 hour ago
+  disaster_recovery_rto: "30 minutes"  # Recover within 30 minutes
+
+# Testing Configuration
+testing:
+  unit_tests:
+    enabled: true
+    framework: "pytest"
+    coverage_threshold: "80%"
+  
+  integration_tests:
+    enabled: true
+    frequency: "daily"
+    test_data_location: "gcs://gok-ai-data-lake/test-data/"
+  
+  e2e_tests:
+    enabled: true
+    schedule: "post-deployment"
+    smoke_tests:
+      - "POST /api/v1/company/analyze"
+      - "POST /api/v1/portfolio/analyze"
+      - "GET /api/v1/status"
+
+# Versioning & Releases
+versioning:
+  semantic_version: "1.0.0"
+  release_process:
+    - "Code commit to main branch"
+    - "Automated tests run (unit + integration)"
+    - "Build Docker image + push to Artifact Registry"
+    - "Deploy to Cloud Run (staging)"
+    - "Run E2E tests"
+    - "Manual approval by Architect"
+    - "Deploy to Cloud Run (production)"
+
+# Maintenance Windows
+maintenance:
+  schedule: "Sundays 2-3 AM UTC"
+  blackout_dates:
+    - "January 25 (test period)"
+    - "February 15 (review period)"
+  notification_period: "7 days advance"
+
+# MVP API BLUEPRINT (W_4: Days 22-28)
+# ESG Scoring Kernel deployed to Cloud Run
+# Public endpoints for enterprise integration
+# BigQuery Public Datasets + causal inference
+
+api_gateway:
+  service_name: "gok-ai-api-gateway"
+  description: "Enterprise API for T_Causality ESG Scoring"
+  platform: "Cloud Run"
+  region: "us-central1"
+  runtime: "python310"
+  memory: "2Gi"
+  cpu: "2"
+  timeout: "3600s"
+  max_instances: "100"
+  
+  endpoints:
+    
+    # Endpoint 1: Company ESG Analysis (Causal)
+    - path: "/api/v1/company/analyze"
+      method: "POST"
+      description: "Analyze company ESG via CAUSAL inference (not correlation)"
+      authentication: "SERVICE_ACCOUNT"
+      request_schema:
+        company_id: "STRING"
+        ticker: "STRING"
+        fiscal_year: "INTEGER"
+        analysis_type: "ENUM(causal, counterfactual, impact_scenario)"
+      response_schema:
+        esg_score_traditional: "FLOAT"
+        esg_score_causal: "FLOAT"
+        causal_factors:
+          - factor: "STRING"
+            impact: "FLOAT"
+            do_calculus_score: "FLOAT"
+            evidence: "STRING"
+        recommendations:
+          - action: "STRING"
+            causal_basis: "STRING"
+            expected_impact: "FLOAT"
+        delta_stab: "FLOAT"
+        processing_time_ms: "INTEGER"
+      example_request:
+        company_id: "acme_corp"
+        ticker: "ACME"
+        fiscal_year: 2024
+        analysis_type: "causal"
+      example_response:
+        esg_score_traditional: 72.5
+        esg_score_causal: 68.3
+        delta: -4.2  # Shows correlation bias removed
+        causal_factors:
+          - factor: "renewable_energy_adoption"
+            impact: 14.2
+            do_calculus_score: 0.94
+            evidence: "Verified causal link via historical intervention analysis"
+          - factor: "supply_chain_transparency"
+            impact: 11.8
+            do_calculus_score: 0.92
+            evidence: "BigQuery Public Dataset: supplier emissions correlation + causal validation"
+        recommendations:
+          - action: "Increase renewable energy to 60% of portfolio"
+            causal_basis: "do(renewable_pct=0.6) → ESG_score +8.5 (verified via Pearl's do-calculus)"
+            expected_impact: 8.5
+        delta_stab: 0.88
+    
+    # Endpoint 2: Portfolio Analysis (Multi-Company)
+    - path: "/api/v1/portfolio/analyze"
+      method: "POST"
+      description: "Analyze portfolio ESG via causal aggregation"
+      authentication: "SERVICE_ACCOUNT"
+      request_schema:
+        portfolio_id: "STRING"
+        companies: ["company_id_1", "company_id_2", "..."]
+        weights: "ARRAY<FLOAT>"
+      response_schema:
+        portfolio_esg_score_causal: "FLOAT"
+        component_contributions:
+          - company_id: "STRING"
+            esg_score: "FLOAT"
+            weight: "FLOAT"
+        causal_interactions:
+          - company_pair: "STRING"
+            interaction_type: "STRING"
+            causal_impact: "FLOAT"
+        aggregated_recommendations: "ARRAY<STRING>"
+        delta_stab: "FLOAT"
+    
+    # Endpoint 3: Counterfactual Scenario Analysis
+    - path: "/api/v1/scenario/counterfactual"
+      method: "POST"
+      description: "What-if analysis: predict ESG impact of specific interventions"
+      authentication: "SERVICE_ACCOUNT"
+      request_schema:
+        company_id: "STRING"
+        interventions:
+          - variable: "STRING"  # e.g., 'renewable_pct', 'supply_chain_tier1_emissions'
+            value: "FLOAT"
+            type: "ENUM(direct, policy, investment)"
+      response_schema:
+        baseline_esg: "FLOAT"
+        predicted_esg_post_intervention: "FLOAT"
+        predicted_delta: "FLOAT"
+        confidence_interval:
+          lower: "FLOAT"
+          upper: "FLOAT"
+        causal_path: "STRING"
+        do_calculus_validation:
+          score: "FLOAT"
+          valid: "BOOLEAN"
+    
+    # Endpoint 4: Causal Impact Assessment (Research)
+    - path: "/api/v1/research/causal-impact"
+      method: "POST"
+      description: "Academic-grade causal impact analysis (for research/publication)"
+      authentication: "RESEARCHER_SERVICE_ACCOUNT"
+      request_schema:
+        research_question: "STRING"
+        treatment_variable: "STRING"
+        outcome_variable: "STRING"
+        confounders: "ARRAY<STRING>"
+        data_source: "ENUM(public_dataset, private_bigquery)"
+      response_schema:
+        causal_effect_estimate: "FLOAT"
+        confidence_interval: "OBJECT"
+        method_used: "STRING"  # "Pearl's Do-Calculus", "Instrumental Variables", etc.
+        assumptions_verified: "ARRAY<STRING>"
+        validity_score: "FLOAT"
+  
+  # BigQuery Public Datasets Integration
+  bigquery_datasets:
+    - name: "US Energy Information Administration (EIA)"
+      dataset_id: "eia_open_data.eia_"
+      tables:
+        - "power_plants" (renewable capacity)
+        - "electricity_sales" (grid data)
+      use_case: "Verify renewable energy causal impact on grid stability"
+    
+    - name: "Google Sustainability (ESG Public)"
+      dataset_id: "bigquery-public-data.google_sustainability"
+      tables:
+        - "esg_metrics_2024"
+      use_case: "Benchmark causal ESG factors"
+    
+    - name: "World Bank Open Data"
+      dataset_id: "bigquery-public-data.world_bank"
+      tables:
+        - "environment" (emissions, energy)
+        - "economic" (GDP, trade)
+      use_case: "Country-level causal analysis"
+  
+  # API Rate Limiting & Quotas
+  rate_limiting:
+    default_requests_per_minute: 60
+    authenticated_user: 300
+    service_account: "unlimited"  # Architect can adjust
+    burst_capacity: 500
+  
+  # API Deployment Process (W_4)
+  deployment_steps:
+    - step: 1
+      description: "Finalize ESG_Scoring_Kernel.py with T_Causality integration"
+      owner: "Architect"
+      deadline: "Day 22"
+    
+    - step: 2
+      description: "Build Docker image with GCP SDK + dependencies"
+      owner: "Pipeline"
+      command: "docker build -t gok-ai-esg-kernel:1.0 ."
+      deadline: "Day 23"
+    
+    - step: 3
+      description: "Push image to Artifact Registry"
+      owner: "Pipeline"
+      command: "gcloud builds submit --tag us-central1-docker.pkg.dev/META-GENIUSZ-GOK-TURBO/gok-ai/esg-kernel:1.0"
+      deadline: "Day 23"
+    
+    - step: 4
+      description: "Create Cloud Run service with environment variables"
+      owner: "Pipeline"
+      command: |
+        gcloud run deploy gok-ai-api-gateway \
+          --image us-central1-docker.pkg.dev/META-GENIUSZ-GOK-TURBO/gok-ai/esg-kernel:1.0 \
+          --platform managed \
+          --region us-central1 \
+          --project META-GENIUSZ-GOK-TURBO \
+          --set-env-vars GCP_PROJECT=META-GENIUSZ-GOK-TURBO,BIGQUERY_DATASET=gok_ai_ltg \
+          --service-account gok-ai-turbo@META-GENIUSZ-GOK-TURBO.iam.gserviceaccount.com \
+          --allow-unauthenticated
+      deadline: "Day 24"
+    
+    - step: 5
+      description: "Test all API endpoints with sample requests"
+      owner: "QA"
+      tests:
+        - "POST /api/v1/company/analyze (causal vs traditional)"
+        - "POST /api/v1/portfolio/analyze (multi-company aggregation)"
+        - "POST /api/v1/scenario/counterfactual (what-if analysis)"
+        - "POST /api/v1/research/causal-impact (academic validation)"
+      deadline: "Day 25"
+    
+    - step: 6
+      description: "Enable monitoring + alerting for API"
+      owner: "Infrastructure"
+      metrics:
+        - "Request latency (target: <500ms for /company/analyze)"
+        - "Error rate (target: <0.5%)"
+        - "BigQuery API usage (cost optimization)"
+      deadline: "Day 25"
+    
+    - step: 7
+      description: "Document API via OpenAPI spec + interactive Swagger UI"
+      owner: "Documentation"
+      output: "API_DOCUMENTATION.md + Swagger endpoint"
+      deadline: "Day 26"
+    
+    - step: 8
+      description: "Architect approval + production readiness certification"
+      owner: "Patryk Sobierański"
+      criteria:
+        - "All tests passing (unit + integration + E2E)"
+        - "Performance meets SLA (latency, throughput)"
+        - "BigQuery costs within budget"
+        - "Security validated (authentication, encryption)"
+      deadline: "Day 27"
+    
+    - step: 9
+      description: "Production launch + monitoring"
+      owner: "Pipeline"
+      actions:
+        - "Activate monitoring dashboards"
+        - "Set up escalation procedures"
+        - "Document runbooks"
+        - "Customer communication (beta API available)"
+      deadline: "Day 28"
+
+# End-of-Phase Checklist (W_4)
+phase_4_completion:
+  infrastructure_stable: false  # Will be true after W_1
+  all_tests_passing: false  # Will be true after W_2
+  performance_baseline_set: false  # Will be true after W_3
+  monitoring_active: false  # Will be true after W_1
+  documentation_complete: true  # Already complete
+  architect_approval_required: true  # Pending
+  api_gateway_deployed: false  # Will be true after W_4 step 8
+  public_datasets_integrated: false  # Will be true after W_4 step 5
+  ready_for_production: false  # Will be true after W_4 final sign-off
+
+# Appendix: Useful Commands
+deployment_commands:
+  deploy_api_gateway: |
+    gcloud run deploy gok-ai-api-gateway \
+      --source=. \
+      --platform managed \
+      --region us-central1 \
+      --project META-GENIUSZ-GOK-TURBO
+  
+  create_bigquery_dataset: |
+    bq mk \
+      --dataset \
+      --location=US \
+      --description="GOK:AI Long-Term Memory" \
+      META-GENIUSZ-GOK-TURBO:gok_ai_ltg
+  
+  test_orchestrator: |
+    python -m pytest tests/test_orchestrator.py -v
+  
+  run_orchestrator_demo: |
+    python CORE/main_orchestrator_v2.py
+
+---
+# End of gcp_project_config.yaml
+# [P=1.0] Configuration manifest complete.
+# Ready for Architect approval and GCP project deployment.

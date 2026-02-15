@@ -1,0 +1,94 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Project specific
+.env
+.env.local
+.env.*.local
+*.log
+logs/
+coverage/
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Testing
+tests/
+test_*.py
+*_test.py
+
+# Documentation (keep for reference but exclude from runtime)
+*.md
+docs/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Node (if frontend exists)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Large files
+*.psd
+*.zip
+*.tar.gz
+*.rar
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Virtual environments
+.venv/
+venv/
+env/

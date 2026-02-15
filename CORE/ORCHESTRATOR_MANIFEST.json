@@ -1,0 +1,130 @@
+{
+  "orchestrator": {
+    "name": "ORCHESTRATOR v2.0",
+    "version": "2.0.0",
+    "type": "system-core",
+    "description": "Centralny mózg GlobalVision Core — integracja ASQK-7G, ASQK-META, GlobalVision, Inference",
+    "author": "Patryk Sobierański (META-GENIUSZ®)",
+    "date": "2026-02-03",
+    
+    "architecture": {
+      "layers": [
+        {
+          "id": "L1_INPUT",
+          "name": "Input Layer",
+          "components": ["IntentVector", "ProjectVector", "ContextVectors"]
+        },
+        {
+          "id": "L2_SYNTHESIS",
+          "name": "Synthesis Layer",
+          "components": ["ASQK-7G", "ASQK-META"]
+        },
+        {
+          "id": "L3_SCORING",
+          "name": "Scoring Layer",
+          "components": ["GlobalVision", "GIS", "PRI", "CAF"]
+        },
+        {
+          "id": "L4_INFERENCE",
+          "name": "Inference Layer",
+          "components": ["T_Causality", "Causal Pathway Analysis"]
+        },
+        {
+          "id": "L5_OUTPUT",
+          "name": "Output Layer",
+          "components": ["ActionVector", "Recommendations", "Response"]
+        }
+      ],
+      
+      "pipeline": [
+        "INPUT → SYNTHESIS (7G) → META-SYNTHESIS → SCORING → INFERENCE → OUTPUT"
+      ]
+    },
+    
+    "components": {
+      "asqk_7g": {
+        "version": "2.0.0",
+        "role": "Synteza lokalna",
+        "path": "CORE/ASQK_7G"
+      },
+      "asqk_meta": {
+        "version": "1.0.0",
+        "role": "Meta-synteza planetarna",
+        "path": "CORE/ASQK_META"
+      },
+      "orchestrator_core": {
+        "version": "2.0.0",
+        "role": "Centralny pipeline decyzyjny",
+        "path": "CORE/orchestrator_v2.py"
+      },
+      "integration_layer": {
+        "version": "1.0.0",
+        "role": "Warstwa integracyjna (adaptery)",
+        "path": "CORE/integration_layer.py"
+      }
+    },
+    
+    "interfaces": {
+      "input": {
+        "IntentVector": {
+          "fields": ["intent_id", "intent_text", "intent_embedding", "context", "priority"],
+          "compatible_with": "ProjectVector v1.0"
+        },
+        "ProjectVector": {
+          "standard": "ProjectVector v1.0",
+          "conversion": "ProjectVectorAdapter"
+        }
+      },
+      "output": {
+        "OrchestratorResponse": {
+          "fields": [
+            "intent_id",
+            "status",
+            "synthesis_result",
+            "meta_synthesis_result",
+            "global_vision_score",
+            "action_vector",
+            "recommendations",
+            "execution_time_ms"
+          ]
+        }
+      }
+    },
+    
+    "integration": {
+      "globalvision": {
+        "status": "PARTIAL",
+        "adapter": "GlobalVisionAdapter",
+        "metrics": ["GIS", "PRI", "CAF", "SPC"]
+      },
+      "inference": {
+        "status": "STUB",
+        "adapter": "InferenceAdapter",
+        "components": ["T_Causality", "Causal Pathway"]
+      },
+      "memory": {
+        "status": "PLANNED",
+        "components": ["LongTermGraph", "KnowledgeBase"]
+      }
+    },
+    
+    "usage": {
+      "basic": "from CORE.orchestrator_v2 import OrchestratorV2",
+      "unified": "from CORE.integration_layer import UnifiedOrchestrator",
+      "example": "python CORE/orchestrator_v2.py"
+    },
+    
+    "compatibility": {
+      "projectvector": "1.0",
+      "globalvision": "1.1",
+      "asqk": "7G v2.0 + META v1.0",
+      "python": "3.9+"
+    },
+    
+    "status": {
+      "development": "ACTIVE",
+      "production_ready": "BETA",
+      "testing": "REQUIRED"
+    }
+  }
+}

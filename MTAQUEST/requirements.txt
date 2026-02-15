@@ -1,0 +1,126 @@
+"""
+MTaQuest + GCP Turbo Project Requirements
+Dependencies for Hybrid Dialog Platform + Google Cloud Integration (Fn=3)
+Supports: DIRECTIVE I (Infrastructure), DIRECTIVE II (Causality), DIRECTIVE III (Market MVP)
+"""
+
+# ============================================================================
+# CORE DEPENDENCIES
+# ============================================================================
+numpy>=1.24.0
+scipy>=1.10.0
+pandas>=1.5.0
+
+# ============================================================================
+# GOOGLE CLOUD PLATFORM (GCP) — PRIMARY INFRASTRUCTURE
+# ============================================================================
+# BigQuery for Long-Term Memory Graph (LTG) storage
+google-cloud-bigquery>=3.11.0
+google-cloud-bigquery-storage>=2.21.0
+
+# Vertex AI for model training & Workbench notebooks
+google-cloud-aiplatform>=1.26.0
+google-vertex-ai-search>=0.4.0
+
+# Cloud Storage for data lake (gok-ai-data-lake bucket)
+google-cloud-storage>=2.9.0
+
+# Cloud Functions/Cloud Run deployment
+google-cloud-functions>=1.5.0
+
+# General Google Cloud client library
+google-cloud-core>=2.3.0
+
+# Authentication & credentials management
+google-auth>=2.21.0
+google-auth-httplib2>=0.1.0
+google-auth-oauthlib>=1.0.0
+
+# ============================================================================
+# DATA PROCESSING & MACHINE LEARNING
+# ============================================================================
+# For intent embeddings & semantic processing
+sentence-transformers>=2.2.0
+transformers>=4.30.0
+torch>=2.0.0
+
+# For causal inference (T_Causality operations)
+networkx>=3.1
+scikit-learn>=1.2.0
+
+# ============================================================================
+# INFRASTRUCTURE & DEPLOYMENT
+# ============================================================================
+# Web framework for API endpoints
+Flask>=2.3.0
+Flask-CORS>=4.0.0
+
+# ASGI/WSGI servers for Cloud Run
+gunicorn>=20.1.0
+uvicorn>=0.23.0
+
+# ============================================================================
+# DATABASE & CACHING
+# ============================================================================
+neo4j>=5.8.0  # Knowledge graph support
+redis>=4.5.0  # Caching layer
+
+# ============================================================================
+# TESTING & QUALITY ASSURANCE
+# ============================================================================
+pytest>=7.3.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+pytest-timeout>=2.1.0
+
+# ============================================================================
+# MONITORING, LOGGING & DIAGNOSTICS
+# ============================================================================
+python-json-logger>=2.0.4
+logging-json>=0.5.0
+
+# GCP Cloud Monitoring integration
+google-cloud-monitoring>=2.12.0
+
+# Metrics & observability
+prometheus-client>=0.17.0
+
+# ============================================================================
+# UTILITIES & CONFIGURATION
+# ============================================================================
+python-dotenv>=0.21.0
+pyyaml>=6.0
+pydantic>=1.10.0  # Data validation
+
+# Time & scheduling
+python-dateutil>=2.8.0
+
+# ============================================================================
+# OPTIONAL: ADVANCED FEATURES
+# ============================================================================
+# For advanced NLP operations
+spacy>=3.5.0
+
+# For visualization (future graphs/dashboards)
+matplotlib>=3.7.0
+plotly>=5.13.0
+
+# ============================================================================
+# DEV DEPENDENCIES (optional, for development environment)
+# ============================================================================
+# Uncomment if installing in dev mode:
+# black>=23.0.0          # Code formatting
+# flake8>=6.0.0          # Linting
+# mypy>=1.0.0            # Type checking
+# ipython>=8.12.0        # Enhanced REPL
+# jupyter>=1.0.0         # Notebook support
+torch>=1.9.0  # For transformers
+
+# Optional: Visualization
+plotly>=5.0.0
+dash>=2.0.0
+
+# Development
+black>=21.7b0
+flake8>=3.9.0
+mypy>=0.910

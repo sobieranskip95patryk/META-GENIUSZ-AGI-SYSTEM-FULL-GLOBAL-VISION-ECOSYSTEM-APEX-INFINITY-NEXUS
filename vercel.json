@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "FRONTEND/index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "INFRA/Services/bridge_server.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/ask_gok",
+      "dest": "INFRA/Services/bridge_server.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/FRONTEND/$1"
+    }
+  ]
+}

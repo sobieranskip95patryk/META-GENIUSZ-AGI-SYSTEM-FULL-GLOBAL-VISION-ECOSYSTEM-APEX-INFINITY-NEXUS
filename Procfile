@@ -1,0 +1,1 @@
+web: gunicorn INFRA.Services.bridge_server:app
