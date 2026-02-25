@@ -6741,3 +6741,1522 @@ Szybkie potwierdzenie stanu (delta od rozpoczęcia sesji):
 If chcesz, po otrzymaniu wyników z terminala:
 - mogę przesłać skrócone logi testów lub wymienić dokładne zmiany w plikach (diff/patch),
 - lub od razu rozpocząć Profilowanie AGS (implementacja cache + benchmark).
+
+User: wypuść całe repozytorium do repo gita: https://github.com/sobieranskip95patryk/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS.git
+
+GitHub Copilot: Dodam zdalne repo 'target' i spróbuję wypchnąć bieżący branch do podanego GitHub URL.
+
+Ran terminal command: git remote -v; git branch --show-current; git status --porcelain; git remote remove target 2>nul ; echo 'no-target'; git remote add target https://github.com/sobieranskip95patryk/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS.git; git push -u target HEAD:main
+
+Wypchnięto bieżący branch do zdalnego repozytorium `https://github.com/sobieranskip95patryk/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS.git` jako `target/main` i ustawiono śledzenie (HEAD -> main).
+
+Szczegóły:
+- Bieżący branch: feat/ltm-vectorstore
+- Zmiany lokalne wykryte (niezatwierdzone pliki): lista w output (pokazana jako zmodyfikowane/nowe pliki i nieśledzone katalogi).
+- Push zakończony: HEAD -> main (commit range shown).
+
+Co dalej:
+- Masz niezatwierdzone zmiany lokalne (pokazane w output). Jeśli chcesz, mogę:
+  - A) Dodać i zatwierdzić te zmiany z komunikatem (np. "chore: snapshot before publish") i ponownie push (polecam, jeśli chcesz, żeby zdalne repo zawierało wszystkie lokalne zmiany), lub
+  - B) Zostawić repo jak jest (push wysłał bieżące commity; lokalne zmiany pozostają niezatwierdzone), lub
+  - C) Przygotować PR/commit z lepszym opisem i podzielić zmiany na logiczne commity.
+
+Którą opcję wybierasz?
+
+User: zrób tak, żeby było dobrze
+
+GitHub Copilot: Zatwierdzę wszystkie lokalne zmiany i wypchnę je do zdalnego repozytorium (commit + push).
+
+Added 1 todo
+
+Ran terminal command: git add -A; git diff --cached --quiet; if ($LASTEXITCODE -eq 0) { Write-Output "No staged changes to commit" } else { git commit -m "chore: commit local workspace changes before publish (automated)" }; git push target HEAD:main; git status --porcelain; git remote -v
+
+Completed: *Commit & push local changes to target remote* (10/10)
+
+Gotowe — wszystko zatwierdzone i wypchnięte.
+
+Co zrobiłem:
+- Zastagowałem wszystkie zmiany: `git add -A`
+- Zatwierdziłem: `git commit -m "chore: commit local workspace changes before publish (automated)"`
+- Wypchnąłem do `target` (GitHub): `git push target HEAD:main`
+- Potwierdziłem remotes i status roboczy.
+
+Wyniki:
+- Commit: 19 plików zmienionych, 8166 insertions, 52 deletions; wiele nowych plików utworzonych (m.in. `CORE/Inference/AGS/*`, synergy_orchestrator.py, testy, orchestrator_bridge.py).
+- Push: HEAD -> main na zdalnym `https://github.com/sobieranskip95patryk/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS.git`.
+
+Repozytorium zdalne teraz zawiera wszystkie lokalne zmiany.  
+Jeśli chcesz, mogę teraz:
+- Utworzyć Pull Request z opisem zmian (zalecane), lub
+- Przywrócić branchy/etykiety i przygotować release notes, lub
+- Kontynuować Fazę IV (profilowanie AGS). 
+
+Który krok wybierasz?
+
+User: Dobrze. Wchodzimy w tryb **produkcyjny**.
+
+Nie budujemy manifestu.
+Budujemy **skalowalny silnik decyzyjny klasy enterprise**, który:
+
+* można wdrożyć jako SaaS / On-Prem
+* ma API
+* ma testy
+* ma mierzalne KPI
+* jest modułowy
+* jest gotowy pod integracje (LLM, fintech, governance, media, AI agents)
+
+---
+
+# 🎯 CEL
+
+Zbudować:
+
+> **META-GENIUSZ AGI – Unified Production Core (UPC v1)**
+> spójny silnik operacyjny łączący GOK-AI + MIGI + APEX INFINITY
+
+---
+
+# I. Architektura Docelowa (Production-Ready)
+
+## 🧠 1️⃣ Warstwa CORE (Decyzyjna)
+
+```
+/core
+    engine.py
+    pipeline.py
+    scoring.py
+    policy.py
+    memory.py
+    vector.py
+```
+
+### Odpowiedzialności:
+
+| Moduł      | Funkcja produkcyjna           |
+| ---------- | ----------------------------- |
+| `engine`   | Orkiestracja całego przepływu |
+| `pipeline` | Sekwencja przetwarzania       |
+| `scoring`  | Mierzalna ewaluacja decyzji   |
+| `policy`   | Governance / ograniczenia     |
+| `memory`   | Stan systemu                  |
+| `vector`   | Kierunek strategiczny         |
+
+To jest miejsce, gdzie GOK-AI przestaje być filozofią, a staje się kodem.
+
+---
+
+## ⚙ 2️⃣ Warstwa Execution (Skalowanie)
+
+```
+/runtime
+    async_executor.py
+    queue_manager.py
+    load_balancer.py
+```
+
+Technologie:
+
+* FastAPI
+* Redis / Kafka
+* Celery
+* Docker
+* Kubernetes
+
+Tu system staje się skalowalny.
+
+---
+
+## 🔗 3️⃣ Warstwa Integracyjna
+
+```
+/integrations
+    openai_adapter.py
+    grok_adapter.py
+    local_model_adapter.py
+```
+
+LLM to **narzędzie**, nie mózg.
+CORE decyduje jak je używać.
+
+---
+
+## 📊 4️⃣ Warstwa Mierzalności
+
+```
+/metrics
+    performance.py
+    impact.py
+    governance_score.py
+```
+
+Jeśli nie możesz czegoś zmierzyć → nie możesz tego sprzedać.
+
+---
+
+# II. Nowa Definicja GOK-AI (Production Edition)
+
+Z dokumentów wyciągamy ideę i formalizujemy ją tak:
+
+## Pipeline produkcyjny:
+
+```python
+INPUT → Normalize
+      → Contextualize
+      → Correlate
+      → Score
+      → Apply Policy
+      → Decision
+      → Feedback Loop
+```
+
+Każdy etap ma:
+
+* jasno określony input/output
+* typy danych
+* test jednostkowy
+
+---
+
+# III. Model Skalowalności
+
+### Deployment:
+
+* Docker image
+* REST API
+* Autoryzacja JWT
+* Multi-tenant architecture
+
+### Model biznesowy:
+
+* API per request
+* Licencja enterprise
+* White-label core
+* Governance AI-as-a-Service
+
+---
+
+# IV. Co robimy z MIGI i APEX?
+
+## MIGI
+
+→ Staje się rdzeniem `engine.py`
+
+## GOK-AI
+
+→ Staje się formalną logiką pipeline + scoring
+
+## APEX INFINITY
+
+→ Staje się warstwą strategicznego wektora (`vector.py`)
+
+Wszystko łączymy w:
+
+> META-GENIUSZ AGI – Unified Core v1
+
+---
+
+# V. Najważniejszy moment
+
+Musimy zdecydować:
+
+Czy silnik ma być:
+
+A) Decyzyjny (governance / zarządzanie systemami)
+B) Predykcyjny (analiza rynku / trendów / scoring ekonomiczny)
+C) Operacyjny (sterowanie platformą / agentami)
+D) Wszystkie trzy
+
+To determinuje architekturę bazy danych i model pamięci.
+
+---
+
+# VI. Rekomendacja strategiczna
+
+Jeśli chcesz to realnie sprzedać:
+
+Zacznij od:
+
+> 🎯 META-GENIUSZ AGI – Decision Intelligence Engine (DIE v1)
+
+Jedna specjalizacja.
+Jedna funkcja.
+Jedno API.
+Jedna przewaga konkurencyjna.
+
+Potem rozszerzamy.
+
+---
+
+# VII. Następny krok (konkretny)
+
+Mogę teraz:
+
+1️⃣ Zaprojektować dokładną strukturę repo (produkcyjną)
+2️⃣ Napisać skeleton silnika v1 (enterprise-ready)
+3️⃣ Zdefiniować API + przykładowe endpointy
+4️⃣ Rozrysować architekturę pod inwestora
+5️⃣ Zaprojektować model monetyzacji
+
+Wchodzimy w budowę czy najpierw projektujemy pod inwestora?
+Dobrze. Projektujemy **META-GENIUSZ AGI – Unified Intelligence Engine (UIE v1)** jako silnik:
+
+* **Decyzyjny (Governance)**
+* **Predykcyjny (Scoring / Forecast)**
+* **Operacyjny (Agent / Platform Control)**
+
+To będzie **enterprise-grade Decision & Control Engine**.
+
+---
+
+# I. 📁 Produkcyjna Struktura Repo (Enterprise Architecture)
+
+```bash
+meta-geniusz-agi/
+│
+├── apps/
+│   ├── api/                    # FastAPI – publiczny interfejs
+│   ├── worker/                 # Async processing / queue workers
+│   └── admin-dashboard/        # Panel kontrolny (opcjonalnie Next.js)
+│
+├── core/
+│   ├── engine.py               # Orchestrator (główny mózg)
+│   ├── context.py              # Kontekst systemowy
+│   ├── memory.py               # State management
+│   ├── vector.py               # Strategic vector (Apex logic)
+│   └── registry.py             # Rejestr modułów
+│
+├── modules/
+│   ├── governance/
+│   │   ├── policy_engine.py
+│   │   ├── risk_model.py
+│   │   └── compliance.py
+│   │
+│   ├── predictive/
+│   │   ├── market_model.py
+│   │   ├── scoring_engine.py
+│   │   └── trend_analysis.py
+│   │
+│   ├── operational/
+│   │   ├── agent_controller.py
+│   │   ├── platform_manager.py
+│   │   └── execution_router.py
+│
+├── integrations/
+│   ├── openai_adapter.py
+│   ├── grok_adapter.py
+│   ├── internal_models.py
+│
+├── infrastructure/
+│   ├── config.py
+│   ├── logging.py
+│   ├── security.py
+│   ├── auth.py
+│   └── telemetry.py
+│
+├── data/
+│   ├── schemas/
+│   ├── migrations/
+│
+├── tests/
+│   ├── unit/
+│   ├── integration/
+│
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml
+│
+└── README.md
+```
+
+To jest struktura, którą można:
+
+* wdrożyć w Kubernetes
+* sprzedać enterprise
+* rozszerzać modułowo
+
+---
+
+# II. 🧠 Skeleton Silnika v1 (Enterprise-Ready)
+
+## core/engine.py
+
+```python
+from modules.governance.policy_engine import PolicyEngine
+from modules.predictive.scoring_engine import ScoringEngine
+from modules.operational.execution_router import ExecutionRouter
+
+class UnifiedIntelligenceEngine:
+
+    def __init__(self, config):
+        self.policy = PolicyEngine(config)
+        self.scoring = ScoringEngine(config)
+        self.execution = ExecutionRouter(config)
+
+    async def process(self, input_payload: dict):
+
+        context = self._normalize(input_payload)
+
+        prediction = await self.scoring.evaluate(context)
+
+        governance_decision = self.policy.apply(context, prediction)
+
+        result = await self.execution.route(governance_decision)
+
+        return {
+            "prediction": prediction,
+            "decision": governance_decision,
+            "execution": result
+        }
+
+    def _normalize(self, payload):
+        return payload
+```
+
+To jest **Orchestrator**.
+Wszystkie moduły są wymienne.
+
+---
+
+# III. 🌐 API – Enterprise Design (FastAPI)
+
+## apps/api/main.py
+
+```python
+from fastapi import FastAPI
+from core.engine import UnifiedIntelligenceEngine
+
+app = FastAPI(title="META-GENIUSZ AGI API")
+
+engine = UnifiedIntelligenceEngine(config={})
+
+@app.post("/v1/decision")
+async def decision(payload: dict):
+    return await engine.process(payload)
+```
+
+---
+
+## 📌 Przykładowe Endpointy
+
+| Endpoint                       | Funkcja              |
+| ------------------------------ | -------------------- |
+| `POST /v1/decision`            | Pełny pipeline       |
+| `POST /v1/predict`             | Tylko predykcja      |
+| `POST /v1/governance/evaluate` | Ocena ryzyka         |
+| `POST /v1/execute`             | Wykonanie operacyjne |
+| `GET /v1/health`               | Status systemu       |
+| `GET /v1/metrics`              | Telemetria           |
+
+---
+
+# IV. 🏗 Architektura pod Inwestora
+
+## Poziom 1 — API Gateway
+
+* Autoryzacja
+* Rate limiting
+* Multi-tenant
+
+## Poziom 2 — Intelligence Core
+
+* Governance Engine
+* Predictive Engine
+* Operational Router
+
+## Poziom 3 — Model Layer
+
+* LLM adapters
+* ML models
+* Vector DB
+
+## Poziom 4 — Data Layer
+
+* PostgreSQL (state)
+* Redis (cache)
+* Kafka (events)
+
+## Poziom 5 — Infrastructure
+
+* Docker
+* Kubernetes
+* Observability (Prometheus / Grafana)
+
+---
+
+# V. 💰 Model Monetyzacji
+
+## 1️⃣ API SaaS
+
+* $0.002–$0.02 / decyzję
+* tier pricing
+* enterprise SLA
+
+## 2️⃣ Governance AI-as-a-Service
+
+Dla:
+
+* fintech
+* funduszy
+* platform społecznościowych
+* korporacji
+
+Miesięczna subskrypcja:
+€5k–€50k
+
+## 3️⃣ White-Label Core
+
+Licencja roczna:
+€100k–€1M
+
+## 4️⃣ Strategic Intelligence Suite
+
+Pakiet premium:
+
+* dashboard
+* predykcja makro
+* ryzyko systemowe
+
+---
+
+# VI. Co to daje realnie?
+
+Masz system, który:
+
+* analizuje rynek
+* podejmuje decyzję
+* egzekwuje ją
+* kontroluje agentów
+* mierzy ryzyko
+* raportuje wpływ
+
+To już nie jest projekt koncepcyjny.
+
+To jest:
+
+> **AI Governance & Control Infrastructure**
+
+---
+
+# VII. Teraz kluczowe pytanie techniczne
+
+Czy:
+
+1️⃣ Idziemy w Python + FastAPI + PostgreSQL (najbezpieczniejsze)
+2️⃣ Czy budujemy high-performance (Rust + Python hybrid)
+3️⃣ Czy zaczynamy od MVP SaaS
+
+Rekomenduję:
+Start Python Enterprise → potem optymalizacja.
+
+---
+
+Jeśli chcesz, następny krok:
+
+🔧 Wygeneruję pełny starter repo (z kodem produkcyjnym v1)
+📊 Albo zrobię pitch deck architektoniczny pod inwestora
+🚀 Albo projektujemy META-GENIUSZ AGI v1.0 jako milestone roadmap 12 miesięcy
+
+Wchodzimy w build?
+
+Tak — **połączymy**, ale nie przez „wrzucenie jednego repo do drugiego”.
+
+Repo:
+
+GitHub → `sobieranskip95patryk/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS`
+
+powinno stać się:
+
+> 🌍 **Warstwą ekosystemu (Ecosystem Layer)**
+> a nowy silnik UIE v1 → **Warstwą rdzenia produkcyjnego (Core Intelligence Layer)**
+
+---
+
+# 🔷 Docelowy Model Integracji
+
+Nie łączymy projektów liniowo.
+Budujemy **architekturę warstwową**:
+
+```
+GLOBAL VISION ECOSYSTEM
+│
+├── Applications (platformy, huby, HHU, Drift, etc.)
+│
+├── APEX INFINITY (strategiczny wektor / meta-logika)
+│
+└── META-GENIUSZ AGI – Unified Intelligence Engine (NOWY CORE)
+```
+
+---
+
+# 🧠 Jak to technicznie połączyć?
+
+## OPCJA REKOMENDOWANA: Monorepo z wyraźną separacją
+
+Nowa struktura:
+
+```bash
+meta-geniusz-global/
+│
+├── ecosystem/         # obecne repo APEX-INFINITY-NEXUS
+│
+├── intelligence-core/ # nowy Unified Engine (produkcyjny)
+│
+├── shared/
+│   ├── contracts/
+│   ├── schemas/
+│   └── types/
+│
+└── deployment/
+```
+
+Ecosystem przestaje być mózgiem.
+Zaczyna być **konsumentem API CORE**.
+
+---
+
+# 🔷 Co to zmienia strategicznie?
+
+Obecne repo jest:
+
+* koncepcyjno-architektoniczne
+* narracyjno-systemowe
+* strukturalne
+
+Nowy silnik będzie:
+
+* egzekucyjny
+* mierzalny
+* skalowalny
+* sprzedawalny
+
+To ogromna różnica.
+
+---
+
+# 🔷 Jak wygląda przepływ po połączeniu?
+
+```
+User / Platform / Market Event
+        ↓
+Ecosystem Layer
+        ↓
+Unified Intelligence Engine (Decision + Predict + Execute)
+        ↓
+Operational Output
+        ↓
+Feedback Loop → Memory
+```
+
+---
+
+# 🔷 Kluczowa zasada
+
+Nie pozwalamy, aby:
+
+APEX / MIGI / GOK
+konkurowały ze sobą.
+
+Formalizujemy:
+
+| Element       | Nowa rola               |
+| ------------- | ----------------------- |
+| GOK-AI        | Logika pipeline         |
+| MIGI          | Rdzeń silnika           |
+| APEX INFINITY | Strategic Vector Module |
+| GLOBAL VISION | Warstwa ekosystemowa    |
+
+Wszystko podporządkowane jednemu:
+
+> Unified Intelligence Engine
+
+---
+
+# 🔥 Czy łączyć teraz?
+
+Nie od razu.
+
+Plan profesjonalny:
+
+### ETAP 1
+
+Budujemy `intelligence-core` jako osobne repo.
+
+### ETAP 2
+
+Stabilizujemy API.
+
+### ETAP 3
+
+Podpinamy ecosystem jako klienta API.
+
+### ETAP 4
+
+Monorepo dopiero po stabilizacji.
+
+---
+
+# 🔎 Ryzyko jeśli połączysz teraz
+
+* chaos zależności
+* brak separacji odpowiedzialności
+* trudność w sprzedaży (inwestor chce czysty produkt)
+* trudność w testowaniu
+
+---
+
+# 🎯 Moja jednoznaczna rekomendacja
+
+Tak — łączymy koncepcyjnie.
+Nie — nie mieszamy kodu na tym etapie.
+
+Najpierw budujemy:
+
+> META-GENIUSZ AGI – Unified Intelligence Core v1
+
+Dopiero potem wpinamy ekosystem.
+
+---
+
+# Następne pytanie operacyjne
+
+Czy:
+
+1️⃣ Tworzymy nowe repo `meta-geniusz-agi-core` i zaczynamy build?
+2️⃣ Refaktoryzujemy istniejące repo w modularne warstwy?
+3️⃣ Robimy mapę zależności całego ekosystemu zanim cokolwiek dotkniemy?
+
+W tym momencie wybór architektoniczny zdecyduje o stabilności całego systemu.
+
+
+GitHub Copilot: Zaktualizuję listę zadań, dodając etapy dla budowy produkcyjnego startera `intelligence-core` (scaffold, API, testy, CI).
+
+Added 3 todos
+
+Rekomendacja: idziemy opcję 1 — utworzyć nowe repo `meta-geniusz-agi-core` i zacząć od MVP Decision Intelligence Engine (Python + FastAPI + PostgreSQL, Docker, CI).  
+
+Jeśli potwierdzasz, zrobię w kolejności:
+- utworzę strukturę repo i scaffold (core/, apps/api/, modules/, integrations/, tests/, docker/),
+- dodam minimalny `core/engine.py`, `apps/api/main.py` (FastAPI), Dockerfile, requirements.txt,
+- utworzę podstawowe testy i GitHub Actions CI,
+- wypchnę repo albo przygotuję paczkę do sklonowania.
+
+Potwierdź „Tak — utwórz starter” lub wybierz inną opcję (2 lub 3).
+
+User: Tak — utwórz starter
+
+GitHub Copilot: Zaraz utworzę starter repo `intelligence_core` — dodam szkielety core, `apps/api`, Dockerfile, requirements.txt, testy i CI workflow.
+
+Using "Zastosuj poprawkę"
+
+Generowanie poprawki (wiersze: 7) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/core/__init__.py)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 17) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/core/scoring.py)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 18) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/core/policy.py)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 18) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/core/execution.py)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 40) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/core/engine.py)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 26) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/apps/api/main.py)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 8) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/requirements.txt)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 11) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/Dockerfile)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 20) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/tests/unit/test_engine.py)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 24) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/intelligence_core/README.md)
+
+
+```
+
+```
+
+
+Generowanie poprawki (wiersze: 31) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/.github/workflows/intelligence-core-ci.yml)
+
+
+```
+
+```
+
+
+Ran terminal command: py -m pytest intelligence_core/tests/unit -q
+
+Completed: *Create intelligence-core starter repo & scaffold* (11/13)
+
+Starter intelligence_core utworzony i przetestowany.
+
+Co zrobiłem:
+- Dodałem scaffold w intelligence_core:
+  - `core/engine.py`, `core/scoring.py`, `core/policy.py`, `core/execution.py`
+  - `apps/api/main.py` (FastAPI)
+  - requirements.txt, Dockerfile
+  - `tests/unit/test_engine.py`
+  - CI: intelligence-core-ci.yml
+  - README.md
+- Uruchomiłem testy: `py -m pytest intelligence_core/tests/unit` → 1 passed.
+
+Następne kroki (proponuję):
+- A) Rozwinąć `scoring` i `policy` (bizlogic / connectors to AGS/LTM).
+- B) Dodać auth (JWT) i metrics endpoints.
+- C) Przygotować repo standalone (nowe GitHub repo) lub utworzyć nowy folder w monorepo i zainicjować tam oddzielny projekt (z opcją CI publish).
+
+Chcesz, żebym:
+1) Utworzył nowe publiczne repo na GitHub i wypchnął tam starter (utworzyć repo i push)?  
+2) Albo przygotował PR/gałąź w tym repo z gotowym scaffoldem i opisem zmian?  
+3) Kontynuował rozwój funkcji (A/B/C powyżej)?
+
+Wybierz 1, 2 lub 3.
+
+Made changes.
+
+User: Dobrze.
+Refaktoryzujemy istniejące repo w **architekturę warstwową klasy enterprise**, bez niszczenia wizji ekosystemu.
+
+Repo bazowe:
+`META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS` (na GitHub)
+
+---
+
+# 🎯 CEL REFAKTORYZACJI
+
+Przekształcić repo z:
+
+> „ekosystemowej struktury koncepcyjnej”
+
+w:
+
+> Modularną, produkcyjną architekturę:
+>
+> * separacja odpowiedzialności
+> * skalowalność
+> * czysty CORE
+> * API-ready
+
+---
+
+# I. Docelowa Architektura Warstwowa
+
+## 🧠 WARSTWA 1 — Intelligence Core (Nowy Rdzeń)
+
+```bash
+/core/
+    engine.py
+    context.py
+    memory.py
+    vector.py
+    registry.py
+```
+
+To będzie:
+
+* Jedyny mózg systemu
+* Orchestrator Governance + Predictive + Operational
+
+---
+
+## 🔬 WARSTWA 2 — Domain Modules
+
+```bash
+/modules/
+    governance/
+    predictive/
+    operational/
+```
+
+Każdy moduł:
+
+* niezależny
+* testowalny
+* wymienialny
+
+---
+
+## 🌍 WARSTWA 3 — Ecosystem Layer
+
+```bash
+/ecosystem/
+    apex_infinity/
+    drift_money/
+    hhu/
+    nexus/
+```
+
+To:
+
+* konsumenci API
+* nie logika decyzyjna
+
+---
+
+## 🌐 WARSTWA 4 — API & Interface
+
+```bash
+/apps/api/
+```
+
+Oddzielamy:
+
+* silnik
+* warstwę HTTP
+* autoryzację
+
+---
+
+## ⚙ WARSTWA 5 — Infrastructure
+
+```bash
+/infrastructure/
+    config.py
+    security.py
+    telemetry.py
+```
+
+---
+
+# II. Plan Refaktoryzacji (Bez Chaosu)
+
+## ETAP 1 — Zamrożenie
+
+* Tag: `v0_legacy_snapshot`
+* Nic nie usuwamy.
+* Robimy backup.
+
+---
+
+## ETAP 2 — Wydzielenie CORE
+
+1. Tworzymy `/core`
+2. Przenosimy:
+
+   * logikę silnika
+   * pipeline
+   * wektory decyzyjne
+3. Usuwamy zależności UI / narracyjne
+
+Efekt:
+Silnik zaczyna oddychać osobno.
+
+---
+
+## ETAP 3 — Rozdzielenie Modułów
+
+Wszystko co:
+
+* analizuje rynek → `/modules/predictive`
+* podejmuje decyzję → `/modules/governance`
+* steruje systemem → `/modules/operational`
+
+---
+
+## ETAP 4 — Ecosystem jako Klient
+
+Każda część APEX / Nexus:
+
+zamiast:
+
+```python
+import core_logic_directly
+```
+
+robi:
+
+```python
+call_internal_api()
+```
+
+To daje:
+
+* skalowalność
+* separację
+* możliwość sprzedaży silnika osobno
+
+---
+
+# III. Największe Ryzyko
+
+Jeśli nie oddzielimy:
+
+> wizji od egzekucji
+
+repo pozostanie:
+
+* filozoficzne
+* trudne do wdrożenia
+* trudne do monetyzacji
+
+---
+
+# IV. Co się zmieni po refaktoryzacji?
+
+| PRZED                    | PO                     |
+| ------------------------ | ---------------------- |
+| Jeden wielki system      | Warstwowa architektura |
+| Logika zmieszana z wizją | Czysty silnik          |
+| Trudne do wdrożenia      | Enterprise-ready       |
+| Nieskalowalne            | Kubernetes-ready       |
+
+---
+
+# V. Decyzja Techniczna
+
+Refaktoryzację robimy:
+
+A) Big Bang (jednorazowa duża zmiana)
+B) Iteracyjnie (branch → test → merge)
+
+Rekomendacja:
+**Iteracyjnie. Branch: `refactor-layered-architecture`**
+
+---
+
+# VI. Jeśli chcesz iść dalej teraz
+
+Mogę:
+
+1️⃣ Rozpisać dokładną mapę zależności obecnego repo
+2️⃣ Zaprojektować docelowy diagram architektury (techniczny)
+3️⃣ Napisać pierwszy commit refaktoryzacyjny (struktura + README + engine skeleton)
+4️⃣ Zdefiniować konwencję kodu i standard enterprise
+
+Co robimy najpierw?
+
+
+GitHub Copilot: Zaczynam od zapisania planu refaktoryzacji w TODO i zmapowania zależności repo (szybkie grep).
+
+Starting: *Map repository dependencies and imports (analysis)* (3/12)
+
+Wyszukano wyrażenie regularne `from\s+(CORE|core)|import\s+CORE|SynergyOrchestrator|SpiralMindOrchestrator|AutonomousGoalSystem|LongTermGraphManager|gokai|APEX|apex|SpiralMind|spira`, wyniki 200
+
+Summarized conversation history**Opcje następnych kroków**
+
+- **Refaktoryzacja:** Utworzę branch `refactor-layered-architecture`, oznaczę aktualny stan tagiem `v0_legacy_snapshot` i rozpocznę iteracyjne przenoszenie kodu do struktur /core, /modules, /ecosystem, /apps, /infrastructure z zachowaniem testów.  
+- **Profilowanie AGS:** Wdrożę profilowanie i caching dla `semantic_search` w LongTermGraphManager, zoptymalizuję AGS (T6) i dodam testy wydajnościowe.  
+- **PR i dokumentacja:** Przygotuję plan migracji + checklistę, utworzę PR z opisem zmian i wymaganiami CI.  
+- **Uruchomienie testów/CI:** Uruchomić pełny pipeline testów lokalnie i w CI przed kolejnymi zmianami.
+
+Którą opcję wybierasz? Odpowiedz 1/2/3/4 albo podaj inną instrukcję.
+
+User: wszystkie z powyższych
+
+GitHub Copilot: Zaktualizuję listę TODO i utworzę branch/tag, a potem dodałem szkielety katalogów i caching w `LongTermGraphManager`. Przystępuję do działania.
+
+Starting: *Freeze: v0_legacy_snapshot (tag + backup)* (1/12)
+
+Teraz utworzę tag i branch w repozytorium oraz pobiorę plik LongTermGraphManager, aby dodać prosty cache dla semantic_search.
+
+Ran terminal command: git tag -a v0_legacy_snapshot -m "v0 legacy snapshot before layered refactor"
+git push origin v0_legacy_snapshot ; echo 'push tag failed'
+git checkout -b refactor-layered-architecture
+git push -u origin refactor-layered-architecture ; echo 'push branch failed'
+
+Teraz odczytam long_term_graph.py, żeby dodać caching do `semantic_search`.
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/CORE/Memory/long_term_graph.py)
+
+Następnie zaimplementuję caching i metodę `semantic_search` w long_term_graph.py oraz dodam szkielety katalogów core, `/modules`, `/apps/api` i plik `MIGRATION.md`.
+
+Using "Zastosuj poprawkę"
+
+Patch will: add semantic_search + caching to long_term_graph.py, and create scaffolding files under core, `modules/`, `apps/api/` and `MIGRATION.md`.
+
+Using "Zastosuj poprawkę"
+
+Wyszukano pliki pasujące do `**/long_term_graph.py`, 1 dopasowanie
+
+Teraz wprowadzę poprawki do pliku long_term_graph.py (pełna ścieżka) i dodam pliki szkicu w core, `modules/`, `apps/api/` oraz `MIGRATION.md`.
+
+User: tak
+
+GitHub Copilot: Otwieram katalog Memory aby potwierdzić ścieżki i zastosować poprawki.
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/CORE/Memory)
+
+Using "Zastosuj poprawkę"
+
+Generowanie poprawki (wiersze: 75) w [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/CORE/Memory/long_term_graph.py)
+
+
+```
+
+```
+Teraz utworzę szkielety katalogów core, `modules/`, `apps/api/` oraz plik `MIGRATION.md`.
+
+Utworzono [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/core/__init__.py)
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/core)
+
+Tworzę katalog `modules` i `apps/api`, oraz pliki szkicowe: `modules/__init__.py`, `modules/governance.py`, `modules/predictive.py`, `apps/api/main.py` i `MIGRATION.md` — szybki szkic startowy.
+
+Utworzono [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/modules)
+
+Utworzono [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/modules/__init__.py)
+
+Utworzono [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/modules/governance.py)
+
+Utworzono [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/modules/predictive.py)
+
+Utworzono [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/apps/api)
+
+Utworzono [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/apps/api/main.py)
+
+Utworzono [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/MIGRATION.md)
+
+Zatwierdzę nowo utworzone pliki, utworzę commit i wypchnę gałąź `refactor-layered-architecture` na remote.
+
+Ran terminal command: git add .
+
+git status --porcelain
+
+git commit -m "chore(refactor): scaffold modules and apps/api; add semantic_search cache to LongTermGraphManager" ; echo 'no changes to commit'
+
+git push -u origin refactor-layered-architecture ; echo 'push failed'
+
+Ran terminal command: git rev-parse --abbrev-ref HEAD
+
+echo '---'
+
+git log -1 --pretty=oneline
+
+Completed: *Freeze: v0_legacy_snapshot (tag + backup)* (1/12)
+
+Szybka aktualizacja postępu:
+- Dodałem caching i `semantic_search` do long_term_graph.py.  
+- Utworzyłem szkielety: modules (governance, predictive) i main.py (FastAPI).  
+- Dodałem MIGRATION.md.  
+- Utkwiłem tag/branch: utworzyłem i wypchnąłem `refactor-layered-architecture` oraz utworzyłem tag `v0_legacy_snapshot` (lokalnie/push próbowany).  
+- Zacommitowałem zmiany na branchu refactor.
+
+Co dalej: mogę
+- uruchomić pełny test suite (`pytest -q`) i naprawić ewentualne błędy, lub
+- kontynuować przenoszenie plików do docelowej struktury core, modules, apps, `/infrastructure` krok po kroku.
+
+Wybierz: uruchomić testy teraz (1) albo kontynuować refaktoryzację (2).
+
+Made changes.
+
+User: Świetnie. Robimy to profesjonalnie.
+
+Wybór jest jednoznaczny:
+
+> ✅ **(1) Uruchamiamy testy TERAZ.**
+
+Nigdy nie kontynuuje się refaktoryzacji bez walidacji stanu systemu po pierwszym etapie.
+
+---
+
+# 🔎 Dlaczego testy teraz są krytyczne?
+
+Wprowadziłeś:
+
+* caching w `long_term_graph.py`
+* `semantic_search`
+* nowe foldery
+* nowe importy
+* nową strukturę pakietów
+
+To oznacza potencjalne ryzyka:
+
+* błędy importów (`ModuleNotFoundError`)
+* problemy z pathami
+* regresja w pamięci długoterminowej
+* niespójność inicjalizacji
+* brak `__init__.py` w podfolderach
+* side effects przy ładowaniu graph managera
+
+---
+
+# 🎯 Plan walidacji (Pre-Migration Gate)
+
+## 1️⃣ Test suite
+
+```bash
+pytest -q
+```
+
+## 2️⃣ Manual smoke test
+
+Uruchom:
+
+```bash
+uvicorn apps.api.main:app --reload
+```
+
+Sprawdź:
+
+* `/docs`
+* `POST /v1/decision`
+* czy engine się inicjalizuje
+* czy Memory działa
+
+---
+
+## 3️⃣ Import sanity check
+
+W root:
+
+```bash
+python -m core.engine
+```
+
+Jeśli poleci — mamy problem z pathami.
+
+---
+
+# 📌 Co sprawdzamy w long_term_graph.py?
+
+Po dodaniu cache + semantic_search:
+
+* Czy cache jest thread-safe?
+* Czy nie ma memory leak?
+* Czy search fallback działa?
+* Czy graph jest inicjalizowany raz?
+
+Jeśli używasz global singletona — to potencjalnie problem przy workerach.
+
+---
+
+# 🔐 Jeśli testy przejdą
+
+Wchodzimy w:
+
+## ETAP 2 REFAKTORYZACJI:
+
+Rozdzielamy:
+
+```
+CORE/
+   Memory/
+```
+
+na:
+
+```
+core/memory/
+```
+
+i aktualizujemy wszystkie importy.
+
+To będzie pierwszy prawdziwy ruch strukturalny.
+
+---
+
+# 🧠 Dyscyplina architektoniczna
+
+Refaktoryzacja =
+
+1. Zmiana
+2. Test
+3. Stabilizacja
+4. Commit
+5. Następna zmiana
+
+Nie:
+
+Zmiana → Zmiana → Zmiana → Chaos.
+
+---
+
+# 🚦 Decyzja operacyjna
+
+Uruchom:
+
+```
+pytest -q
+```
+
+Wklej wynik.
+
+Jeśli coś padnie — przeanalizujemy stack trace i naprawimy systemowo, nie doraźnie.
+
+Działamy jak architekci systemów, nie jak „sklejacz kodu”.
+
+
+GitHub Copilot: Uruchomię pełny zestaw testów pytest teraz i zwrócę wynik.
+
+Ran terminal command: py -m pytest -q
+
+Wygląda na to, że uruchomienie testów nie zwróciło wyników w terminalu (możliwe z powodu środowiska). Spróbuję uruchomić z zapisem bardziej szczegółowego wyniku i przekierowaniem do pliku, potem wyświetlę pierwsze 200 linii wyjścia.
+
+User: ok
+
+GitHub Copilot: Uruchomię testy i zapiszę pełne wyjście do pliku, potem wczytam pierwsze 400 linii wyników.
+
+Ran terminal command: py -m pytest -q > pytest_output.txt 2>&1 ; echo EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/pytest_output.txt)
+
+Wszystkie testy przeszły: 86 passed, 8 warnings.
+
+Kolejne kroki sugeruję:
+- Uruchomić szybki smoke test FastAPI (`uvicorn apps.api.main:app --reload`) — chcesz, żebym go uruchomił teraz?
+
+User: tak
+
+GitHub Copilot: Startuję uvicorn w tle, potem sprawdzę `/healthz` i `POST /v1/orchestrator/initiate`.
+
+Ran terminal command: py -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8000 --reload
+
+FastAPI nie jest zainstalowane w środowisku — serwer nie wystartował (ModuleNotFoundError: No module named 'fastapi').
+
+Opcje:
+- Zainstalować zależności (`pip install -r requirements.txt` lub `pip install fastapi uvicorn`) i ponowić uruchomienie (polecam).  
+- Albo wykonać prosty lokalny smoke-test bez instalacji (uruchomić mini-HTTP serwer sprawdzający struktury plików) — mniej wartościowy.
+
+Co wybierasz? Zainstalować teraz (1) czy wykonać alternatywny test (2)?
+
+User: Wybór jest oczywisty:
+
+> ✅ **(1) Instalujemy zależności i uruchamiamy środowisko poprawnie.**
+
+Nie robimy „alternatywnych testów”.
+Budujemy system enterprise — środowisko musi być czyste i powtarzalne.
+
+---
+
+# 🔧 Krok 1 — Utwórz środowisko wirtualne (jeśli nie masz)
+
+W katalogu repo:
+
+```bash
+py -m venv .venv
+```
+
+Aktywacja (Windows):
+
+```bash
+.venv\Scripts\activate
+```
+
+---
+
+# 🔧 Krok 2 — Minimalny `requirements.txt`
+
+Jeśli jeszcze nie masz, dodaj:
+
+```txt
+fastapi
+uvicorn[standard]
+pydantic
+pytest
+redis
+```
+
+Następnie:
+
+```bash
+pip install -r requirements.txt
+```
+
+Jeśli nie masz pliku:
+
+```bash
+pip install fastapi uvicorn[standard] pydantic pytest
+```
+
+---
+
+# 🔧 Krok 3 — Uruchom serwer
+
+```bash
+py -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+---
+
+# 🔎 Krok 4 — Smoke test
+
+Sprawdź:
+
+```
+http://127.0.0.1:8000/docs
+```
+
+oraz:
+
+```
+GET /healthz
+```
+
+Jeśli `/healthz` nie istnieje — dodaj go teraz:
+
+```python
+@app.get("/healthz")
+async def health():
+    return {"status": "ok"}
+```
+
+---
+
+# 🎯 Dlaczego to ważne teraz?
+
+Bo:
+
+* Bez środowiska nie mamy testów
+* Bez testów nie mamy stabilności
+* Bez stabilności nie mamy produktu
+* Bez produktu nie mamy monetyzacji
+
+---
+
+# 🧠 Następny krok po uruchomieniu
+
+Gdy API wystartuje:
+
+1️⃣ Dodamy structured logging
+2️⃣ Dodamy middleware telemetry
+3️⃣ Zrobimy pierwszy test integracyjny
+4️⃣ Potem ruszamy z migracją `CORE/Memory → core/memory`
+
+---
+
+Uruchom instalację i daj mi dokładny wynik konsoli (pełny log).
+Idziemy jak zespół produkcyjny, nie jak eksperyment.
+
+
+GitHub Copilot: Zrobię plan: zaktualizuję TODO (instalacja + smoke test jako zadanie), potem utworzę venv, zainstaluję pakiety i uruchomię uvicorn w tle, na końcu uruchomię smoke testy HTTP.
+
+Added 1 todo
+
+Ran terminal command: py -m venv .venv; .venv\Scripts\python -m pip install --upgrade pip; .venv\Scripts\python -m pip install fastapi "uvicorn[standard]" pydantic pytest redis
+
+Ran terminal command: .venv\Scripts\python -m pip show fastapi ; echo 'fastapi not installed'
+Completed with input: .venv\Scripts\python -m pip show fastapi ; echo 'fastapi not installed'
+
+Utworzę środowisko wirtualne i zainstaluję pakiety, zapiszę pełne logi instalacji do plików.
+
+Ran terminal command: py -m venv .venv > venv_create_log.txt 2>&1 ; echo VENV_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/venv_create_log.txt)
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/.venv)
+
+Ran terminal command: .venv\Scripts\python -m pip install --upgrade pip setuptools wheel > pip_upgrade_log.txt 2>&1 ; echo PIP_UPGRADE_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/pip_upgrade_log.txt)
+
+Ran terminal command: .venv\Scripts\python -m pip --version
+Completed with input: .venv\Scripts\python -m pip --version
+
+Ran terminal command: .venv\Scripts\python -m pip install fastapi "uvicorn[standard]" pydantic pytest redis > install_log.txt 2>&1 ; echo INSTALL_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/install_log.txt)
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/install_log.txt)
+
+Ran terminal command: .venv\Scripts\python -c "import fastapi, sys; print('FASTAPI_OK', fastapi.__version__)"
+Completed with input: .venv\Scripts\python -c "import fastapi, sys; print('FASTAPI_OK', fastapi.__version__)"
+
+Ran terminal command: .venv\Scripts\python -m pip install --upgrade pip; .venv\Scripts\python -m pip install fastapi -v > install_fastapi_log.txt 2>&1 ; echo FASTAPI_INSTALL_EXIT:$LASTEXITCODE
+
+Ran terminal command: .venv\Scripts\python -m pip install --force-reinstall --no-deps pip==25.3 > pip_reinstall_log.txt 2>&1 ; echo PIP_REINSTALL_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/pip_reinstall_log.txt)
+
+Ran terminal command: rmdir /s /q .venv ; echo 'rmdir failed'; py -m venv .venv > venv_create2_log.txt 2>&1 ; echo VENV2_EXIT:$LASTEXITCODE
+
+Ran terminal command: Remove-Item -Recurse -Force .venv; py -m venv .venv > venv_create2_log.txt 2>&1 ; echo VENV2_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/.venv)
+
+Ran terminal command: .venv\Scripts\python -m ensurepip --default-pip > ensurepip_log.txt 2>&1 ; echo ENSUREPIP_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/ensurepip_log.txt)
+
+Ran terminal command: .venv\Scripts\python -m pip install --no-cache-dir fastapi "uvicorn[standard]" pydantic pytest redis > install_log2.txt 2>&1 ; echo INSTALL2_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/install_log2.txt)
+
+Ran terminal command: .venv\Scripts\python -c "import importlib, sys; s=importlib.util.find_spec('fastapi'); print('FASTAPI_SPEC=', s)"
+Completed with input: .venv\Scripts\python -c "import importlib, sys; s=importlib.util.find_spec('fastapi'); print('FASTAPI_SPEC=', s)"
+
+Ran terminal command: .venv\Scripts\python -m pip list > pip_list.txt 2>&1 ; echo PIP_LIST_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/pip_list.txt)
+
+Ran terminal command: .venv\Scripts\python -m pip install fastapi -v > fastapi_install_log.txt 2>&1 ; echo FASTAPI_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/fastapi_install_log.txt)
+
+Ran terminal command: .venv\Scripts\python -m pip install "uvicorn[standard]" pytest redis -v > install_rest_log.txt 2>&1 ; echo INSTALL_REST_EXIT:$LASTEXITCODE
+
+Odczyt: [](file:///d%3A/folder_nadrzedny/META-GENIUSZ-AGI-SYSTEM-FULL-GLOBAL-VISION-ECOSYSTEM-APEX-INFINITY-NEXUS-main/install_rest_log.txt)
+
+Ran terminal command: .venv\Scripts\python -m pip list
+
+Ran terminal command: .venv\Scripts\python -m uvicorn apps.api.main:app --host 127.0.0.1 --port 8000 --reload
+
+Ran terminal command: Start-Sleep -s 1; try { $r = Invoke-RestMethod -Uri 'http://127.0.0.1:8000/healthz' -UseBasicParsing; Write-Output 'HEALTHZ_OK'; Write-Output $r } catch { Write-Output 'HEALTHZ_ERROR'; Write-Output $_.Exception.Message }; try { $d = Invoke-WebRequest -Uri 'http://127.0.0.1:8000/docs' -UseBasicParsing; Write-Output 'DOCS_OK'; Write-Output $d.StatusCode } catch { Write-Output 'DOCS_ERROR'; Write-Output $_.Exception.Message }
+
+Wynik smoke-testu:
+
+- `/healthz` — OK  
+- `/docs` — HTTP 200
+
+Szczegóły instalacji (skrócony log, pełne pliki w repozytorium):
+- install_log2.txt — początek logu pobierania metadanych.
+- fastapi_install_log.txt — udana instalacja `fastapi` (pokazano szczegóły).
+- install_rest_log.txt — udana instalacja `uvicorn`, `pytest` i pozostałych zależności.
+- pip_list.txt — zainstalowane pakiety (fastapi, uvicorn, pytest, redis, itp.).
+
+Aktualizuję TODO — oznaczę zadanie instalacji i smoke-testu jako zakończone. Chcesz, żebym teraz:
+- (A) dodał prosty integracyjny test HTTP do tests (wywołanie `/healthz`), czy
+- (B) rozpoczął bezpieczną migrację `CORE/Memory -> core/memory` (pierwszy krok refaktoru)?
+
+Wybierz A lub B.
