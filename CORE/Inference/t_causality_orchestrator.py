@@ -124,7 +124,7 @@ class TCausalityOrchestrator:
             
             # Causal Isolation
             print("\n[I.2] Wektor Causal Isolation...")
-            spurious_correlations = self.causal_isolation.identify_spurious_correlations(threshold=0.4)
+            spurious_correlations = self.causal_isolation.identify_spurious_correlations(threshold=0.3)
             
             # Filtracja grafu
             print("\n[I.3] Filtracja grafu przyczynowego...")
@@ -392,10 +392,33 @@ class TCausalityOrchestrator:
         }
         
         report_path = os.path.join(project_root, "T_CAUSALITY_TRANSITION_REPORT.json")
-        
+        # Ensure all numpy types / non-serializable objects are converted to native Python types
+        def _make_serializable(o):
+            # primitives
+            try:
+                import numpy as _np
+            except Exception:
+                _np = None
+
+            if isinstance(o, dict):
+                return {str(k): _make_serializable(v) for k, v in o.items()}
+            if isinstance(o, list):
+                return [_make_serializable(v) for v in o]
+            if _np is not None and isinstance(o, (_np.bool_, _np.integer, _np.floating)):
+                return o.item()
+            if isinstance(o, (bool, int, float, str)):
+                return o
+            # fallback: convert to string
+            try:
+                return str(o)
+            except Exception:
+                return repr(o)
+
+        serializable_report = _make_serializable(report)
+
         with open(report_path, 'w', encoding='utf-8') as f:
-            json.dump(report, f, indent=2, ensure_ascii=False)
-        
+            json.dump(serializable_report, f, indent=2, ensure_ascii=False)
+
         print(f"\n[REPORT] Zapisano raport: {report_path}")
     
     def get_system_status(self) -> Dict:

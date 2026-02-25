@@ -51,6 +51,7 @@ from dataclasses import dataclass, asdict, field
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
+from CORE.Inference.autonomous_goal_system import AutonomousGoalSystem
 
 
 # ============================================================================
@@ -78,7 +79,8 @@ class HybridDialogProtocol:
 class IntentQuantizationEngine:
     """Stub for MTaQuest IQE — to be imported in production"""
     def quantize_intent(self, intent_text: str, context: Dict) -> List[float]:
-        return [0.5 + 0.1 * i for i in range(768)]  # BERT-like embedding
+        # Produce a deterministic BERT-like vector in [-1.0, 1.0]
+        return [((i / 767.0) * 2.0 - 1.0) for i in range(768)]
 
 
 class VectorSynchronizationEngine:
@@ -152,16 +154,22 @@ class MTaQuestBridge:
     - VSE: State synchronization
     """
     
-    def __init__(self, architect_id: str = "PATRYK_SOBIERANSKI_PM", ltm: Optional[Any] = None):
+    def __init__(self, architect_id: str = "PATRYK_SOBIERANSKI_PM", ltm: Optional[Any] = None, scaling_manager: Optional[Any] = None):
         self.architect_id = architect_id
         # Optional LongTermGraphManager instance for semantic recall
         self.ltm = ltm
+        # Initialize AutonomousGoalSystem if LTM provided
+        try:
+            self.ags = AutonomousGoalSystem(self.ltm) if self.ltm is not None else None
+        except Exception:
+            self.ags = None
         
         # Initialize MTaQuest components
         self.hdp = HybridDialogProtocol()
         self.iqe = IntentQuantizationEngine()
         self.vse = VectorSynchronizationEngine()
-        self.scaling_mgr = ScalingManager_v3()
+        # Allow injection of a scaling manager (for testing / integration)
+        self.scaling_mgr = scaling_manager if scaling_manager is not None else ScalingManager_v3()
         
         # Metrics tracking
         self.executions_count = 0
@@ -361,33 +369,54 @@ class MTaQuestBridge:
 
 
     # ------------------ AGS Helper Methods (T6) ------------------
-    def generate_autonomous_query(self, missing_link: Dict, knowledge_graph: Dict) -> str:
-        """Generate an autonomous BigQuery-like query to investigate a missing causal link.
+    def generate_autonomous_query(self, missing_link: Any, knowledge_graph: Optional[Dict] = None) -> str:
+        """Generate an autonomous query.
 
-        Args:
-            missing_link: {'from': str, 'to': str, 'reason': str}
-            knowledge_graph: dict of known nodes
-
-        Returns:
-            SQL-like query string probing relationships between nodes
+        Accepts either a `focus_area` string or a `missing_link` dict. Delegates
+        to `AutonomousGoalSystem.generate_autonomous_query` when available.
         """
-        src = missing_link.get('from')
-        tgt = missing_link.get('to')
-        reason = missing_link.get('reason', '')
+        # If caller passed a simple string, treat it as focus_area
+        if isinstance(missing_link, str):
+            focus_area = missing_link
+        else:
+            # Build a focus_area from missing_link and knowledge_graph for richer context
+            try:
+                src = missing_link.get('from')
+                tgt = missing_link.get('to')
+                reason = missing_link.get('reason', '')
+                focus_area = f"Missing causal link from {src} to {tgt}. Reason: {reason}"
+            except Exception:
+                focus_area = str(missing_link)
 
-        # Simple template for a query — tests check for presence of SELECT/from/to
-        query = (
-            f"SELECT * FROM bigquery_dataset.causal_relations "
-            f"WHERE source = '{src}' AND target = '{tgt}' -- {reason}"
-        )
+        # Delegate to AGS if available
+        if getattr(self, 'ags', None) and hasattr(self.ags, 'generate_autonomous_query'):
+            try:
+                return self.ags.generate_autonomous_query(focus_area, depth=3)
+            except Exception:
+                pass
 
-        return query
+        # Fallback SQL-like template
+        if isinstance(missing_link, dict):
+            src = missing_link.get('from')
+            tgt = missing_link.get('to')
+            reason = missing_link.get('reason', '')
+            return (
+                f"SELECT * FROM bigquery_dataset.causal_relations "
+                f"WHERE source = '{src}' AND target = '{tgt}' -- {reason}"
+            )
+
+        return f"SELECT * FROM longterm_memory WHERE focus='{focus_area}' -- depth=3"
 
     def generate_causal_proof(self, recommendation: str, causal_graph: List[Dict]) -> Dict:
-        """Produce a lightweight causal proof summary using provided causal_graph.
+        # Delegate to AGS if available (expects hypothesis + query_results)
+        if getattr(self, 'ags', None):
+            try:
+                current_state = getattr(self, 'current_state', None) or {}
+                return self.ags.generate_causal_proof(recommendation, causal_graph, current_state, depth=2)
+            except Exception:
+                pass
 
-        Strategy: find supporting edges and return the maximum do_calculus_score found.
-        """
+        # Fallback behavior
         best_score = 0.0
         evidence = []
         for e in causal_graph:
@@ -406,14 +435,47 @@ class MTaQuestBridge:
 
         return proof
 
-    def generate_causal_hypothesis(self, patterns: List[Dict], architect_intent: Dict) -> Dict:
-        """Select the most causally-grounded pattern from candidates."""
+    def generate_causal_hypothesis(self, patterns: Any, architect_intent: Dict = None) -> Dict:
+        """Supports two call styles:
+        - generate_causal_hypothesis(problem_statement: str)
+        - generate_causal_hypothesis(patterns: List[Dict], architect_intent: Dict)
+        """
+        # Case A: caller provided a problem_statement string
+        if isinstance(patterns, str):
+            problem_statement = patterns
+            # build simple context from LTM
+            ctx = []
+            try:
+                if getattr(self, 'ltm', None) and hasattr(self.ltm, 'semantic_search'):
+                    res = self.ltm.semantic_search(f"Context for: {problem_statement}", k=3) or []
+                    ctx = [r.get('metadata', {}).get('content') or r.get('content') for r in res if isinstance(r, dict)]
+            except Exception:
+                ctx = []
+
+            if getattr(self, 'ags', None) and hasattr(self.ags, 'generate_causal_hypothesis'):
+                try:
+                    # AGS may return a string hypothesis; normalize to dict
+                    hyp = self.ags.generate_causal_hypothesis(problem_statement, context=ctx)
+                    return {'hypothesis': hyp} if isinstance(hyp, str) else hyp
+                except Exception:
+                    pass
+
+            # fallback
+            return {'hypothesis': f'Unable to generate hypothesis for: {problem_statement}'}
+
+        # Case B: legacy patterns-based call
+        # Delegate to AGS if available
+        if getattr(self, 'ags', None):
+            try:
+                query_results = [{'id': p.get('id', str(i)), 'metadata': {'content': json.dumps(p)}} for i, p in enumerate(patterns)]
+                return {'hypothesis': self.ags._generate_causal_hypothesis(self.ags.current_state, query_results)}
+            except Exception:
+                pass
+
         causal_candidates = [p for p in patterns if p.get('type') == 'causal']
         if causal_candidates:
-            # choose highest do_calculus_score
             chosen = max(causal_candidates, key=lambda p: float(p.get('do_calculus_score', 0.0)))
         else:
-            # fallback: pick the pattern with highest correlation
             chosen = max(patterns, key=lambda p: float(p.get('correlation', 0.0))) if patterns else {}
 
         hypothesis = {
@@ -437,6 +499,23 @@ class MTaQuestBridge:
             if score > best_score:
                 best_score = score
                 target = e.get('target') or e.get('to') or e.get('target_outcome')
+
+        if getattr(self, 'ags', None):
+            try:
+                # If causal_graph already resembles a causal_proof, pass-through; else synthesize a simple proof
+                if isinstance(causal_graph, dict) and 'is_proven' in causal_graph:
+                    causal_proof = causal_graph
+                else:
+                    # pick best edge as supporting evidence
+                    best = max(causal_graph, key=lambda e: float(e.get('do_calculus_score', e.get('weight', 0.0))), default={})
+                    causal_proof = {
+                        'is_proven': float(best.get('do_calculus_score', 0.0)) > 0.92,
+                        'supporting_evidence': [best.get('id')] if best else [],
+                        'knowledge_gaps': []
+                    }
+                return self.ags._ags_synthesize_goal(causal_proof, self.ags.current_state)
+            except Exception:
+                pass
 
         if target is None:
             target = 'stakeholder_value'
@@ -484,6 +563,19 @@ class MTaQuestBridge:
             avg = sum(self.delta_alignment_history[-5:]) / min(len(self.delta_alignment_history), 5)
             return max(0.86, float(avg))
         return 0.87
+
+    def verify_gcp_resources(self, resource_type: str, resource_id: str) -> bool:
+        """Verify availability/status of a GCP resource by delegating to ScalingManager_v3.
+
+        Returns True when the resource is healthy/available, False otherwise.
+        """
+        try:
+            mgr = getattr(self, 'scaling_mgr', None)
+            if mgr and hasattr(mgr, 'verify_gcp_resources'):
+                return bool(mgr.verify_gcp_resources(resource_type, resource_id))
+        except Exception:
+            logger.exception("verify_gcp_resources failed")
+        return False
 
 
 # ============================================================================

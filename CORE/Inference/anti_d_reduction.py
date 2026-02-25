@@ -140,6 +140,19 @@ class MetaCognitiveAudit:
                 context = []
             
             self.calculate_c_d(node, context)
+
+        # Uzupełnij macierz korelacji dla wszystkich par węzłów (pairwise),
+        # aby umożliwić wykrywanie korelacji pozornych między nie-sąsiednimi węzłami
+        # (np. X <-> Y przez wspólnego confoundera Z).
+        for i in range(len(nodes)):
+            for j in range(i + 1, len(nodes)):
+                try:
+                    a = nodes[i]
+                    b = nodes[j]
+                    # Wywołanie _calculate_correlation_strength zapisuje wartość w macierzy
+                    self._calculate_correlation_strength(a, b)
+                except Exception:
+                    continue
         
         # Statystyki
         if self.dependence_scores:
@@ -218,21 +231,26 @@ class CausalIsolation:
             ancestors_a = set()
             ancestors_b = set()
             
-            # BFS w górę (predecessors)
+            # BFS w górę (predecessors) oraz sprawdzenie wspólnych potomków (colliders)
             for depth in range(1, max_depth + 1):
                 if depth == 1:
+                    # Zbieramy zarówno predecessors jak i successors aby wykryć confoundery
                     ancestors_a.update(G.predecessors(node_a))
+                    ancestors_a.update(G.successors(node_a))
                     ancestors_b.update(G.predecessors(node_b))
+                    ancestors_b.update(G.successors(node_b))
                 else:
-                    # Rozszerzenie o kolejny poziom
+                    # Rozszerzenie o kolejny poziom (predecessors i successors)
                     new_ancestors_a = set()
                     for ancestor in list(ancestors_a):
                         new_ancestors_a.update(G.predecessors(ancestor))
+                        new_ancestors_a.update(G.successors(ancestor))
                     ancestors_a.update(new_ancestors_a)
-                    
+
                     new_ancestors_b = set()
                     for ancestor in list(ancestors_b):
                         new_ancestors_b.update(G.predecessors(ancestor))
+                        new_ancestors_b.update(G.successors(ancestor))
                     ancestors_b.update(new_ancestors_b)
             
             common = list(ancestors_a & ancestors_b)

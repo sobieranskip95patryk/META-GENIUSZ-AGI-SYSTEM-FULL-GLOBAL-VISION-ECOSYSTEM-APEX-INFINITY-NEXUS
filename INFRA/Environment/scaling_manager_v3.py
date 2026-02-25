@@ -25,7 +25,7 @@ METRYKI SUKCESU:
 import os
 import json
 import time
-from typing import Dict, Optional, Tuple, List
+from typing import Dict, Optional, Tuple, List, Union
 from dataclasses import dataclass, asdict
 from enum import Enum
 import hashlib
@@ -456,12 +456,15 @@ class ScalingManager_v3:
             "workbench_url": self.vertex_ai.get_workbench_endpoint()
         }
 
-    def verify_gcp_resources(self) -> Dict:
-        """Verify availability of key GCP resources (BigQuery, Vertex AI).
+    def verify_gcp_resources(self, resource_type: Optional[str] = None, resource_id: Optional[str] = None) -> Union[Dict, bool]:
+        """Verify availability of key GCP resources.
 
-        This is a lightweight simulator used by tests to assert infrastructure readiness.
-        If infrastructure is not yet initialized, attempt to initialize it.
-        Returns a dict with boolean flags expected by tests.
+        Behavior:
+        - If called without arguments, returns a dict summary (backwards-compatible).
+        - If called with `resource_type` (and optional `resource_id`), returns bool indicating
+          whether that specific resource is available.
+
+        The method will attempt to initialize infrastructure if not already initialized.
         """
         # If not initialized, attempt initialization (idempotent simulation)
         if not self.resource_allocations:
@@ -470,11 +473,33 @@ class ScalingManager_v3:
             initialized = True
 
         bigquery_enabled = bool(self.resource_allocations and self.resource_allocations.bigquery_enabled)
+        cloud_storage_enabled = bool(self.resource_allocations and self.resource_allocations.cloud_storage_enabled)
         vertex_ai_enabled = bool(self.vertex_ai and self.vertex_ai.api_initialized)
 
+        # If caller requests a specific resource, return a boolean
+        if resource_type:
+            rt = resource_type.strip().lower()
+            # simple normalization and matching
+            if rt in ("vertex_ai", "vertex", "vertexai"):
+                return vertex_ai_enabled
+            if rt in ("bigquery", "bq"):
+                return bigquery_enabled
+            if rt in ("gcs", "storage", "cloud_storage", "gcs_bucket"):
+                # if resource_id points to our known bucket, prefer that
+                if resource_id:
+                    known_bucket = getattr(self.memory_mapping, 'gcs_bucket_name', None)
+                    if known_bucket and resource_id == known_bucket:
+                        return True
+                return cloud_storage_enabled
+
+            # Unknown resource type -> False
+            return False
+
+        # Default: return summary dict (backwards compatible)
         return {
             'bigquery_enabled': bigquery_enabled,
             'vertex_ai_enabled': vertex_ai_enabled,
+            'cloud_storage_enabled': cloud_storage_enabled,
             'initialized': initialized
         }
     

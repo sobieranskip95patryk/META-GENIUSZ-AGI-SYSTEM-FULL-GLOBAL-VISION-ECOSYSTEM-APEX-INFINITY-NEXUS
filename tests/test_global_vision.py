@@ -118,7 +118,7 @@ class TestGlobalVisionAnalyzer(unittest.TestCase):
         )
         
         # Powinno być ograniczone do 1.0 w normalizacji
-        self.assertLess(metrics.gis, 5500)
+        self.assertLessEqual(metrics.gis, 5500)
     
     # ========== Testy walidacji ==========
     

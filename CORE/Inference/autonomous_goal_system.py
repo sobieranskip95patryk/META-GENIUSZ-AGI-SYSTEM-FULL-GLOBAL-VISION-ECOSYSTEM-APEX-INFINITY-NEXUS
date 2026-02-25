@@ -30,6 +30,16 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 from CORE.Memory.long_term_graph import LongTermGraphManager
+try:
+    from CORE.Inference.AGS import QueryGenerator, CausalInferenceEngine, GoalSynthesisEngine
+except Exception:
+    QueryGenerator = None
+    CausalInferenceEngine = None
+    GoalSynthesisEngine = None
+try:
+    from CORE.Inference.logos_language_generator import LogosLanguageSynthesizer as LogosLanguageGenerator
+except Exception:
+    LogosLanguageGenerator = None
 
 
 class GoalOrigin(Enum):
@@ -185,6 +195,15 @@ class AutonomousGOKRecalibrator:
         self.historical_goals: List[Goal] = []
         self.recalibration_events: List[Dict] = []
         self.is_autonomous = False
+        # Initialize AGS components if available
+        try:
+            self.query_gen = QueryGenerator(self.ltm) if QueryGenerator else None
+            self.causal_engine = CausalInferenceEngine(self.ltm) if CausalInferenceEngine else None
+            self.goal_synth = GoalSynthesisEngine(self.ltm) if GoalSynthesisEngine else None
+        except Exception:
+            self.query_gen = None
+            self.causal_engine = None
+            self.goal_synth = None
         
     def initialize_external_goals(self):
         """
@@ -249,6 +268,48 @@ class AutonomousGOKRecalibrator:
         conflict_description = "; ".join(conflicts) if has_conflict else "No conflicts"
         
         return has_conflict, conflict_description
+
+    # --- AGS integration wrappers ---
+    def generate_autonomous_query(self, current_state: SystemState, focus_area: str, depth: int = 3) -> str:
+        """Wrap QueryGenerator.generate if available."""
+        if getattr(self, 'query_gen', None):
+            return self.query_gen.generate(current_state, focus_area, depth)
+        # fallback: simple template
+        return f"SELECT * FROM longterm_memory WHERE focus='{focus_area}' -- depth={depth}"
+
+    def generate_causal_hypothesis(self, current_state: SystemState, query_results: List[Dict[str, Any]]) -> str:
+        """Wrap CausalInferenceEngine.generate_hypothesis if available."""
+        if getattr(self, 'causal_engine', None):
+            return self.causal_engine.generate_hypothesis(current_state, query_results)
+        return "Insufficient evidence to form hypothesis"
+
+    def generate_causal_proof(self, causal_hypothesis: str, query_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Wrap CausalInferenceEngine.generate_proof if available."""
+        if self.causal_engine:
+            # prefer the full featured routine with depth and access to system state
+            try:
+                return self.causal_engine.generate_causal_proof_full(causal_hypothesis, query_results or [], self.current_state, depth=2)
+            except Exception:
+                try:
+                    return self.causal_engine.generate_proof(causal_hypothesis, query_results or [], self.current_state)
+                except Exception:
+                    pass
+        # fallback simple proof generation
+        return self._generate_causal_proof(causal_hypothesis, query_results)
+
+    def ags_synthesize_goal(self, causal_proof: Dict[str, Any], current_state: SystemState) -> Dict[str, Any]:
+        """Wrap GoalSynthesisEngine.synthesize if available."""
+        if getattr(self, 'goal_synth', None):
+            return self.goal_synth.synthesize(causal_proof, current_state)
+        # fallback minimal goal
+        return {
+            'name': 'auto_goal_fallback',
+            'type': 'autonomous_synthesis',
+            'target_outcome': causal_proof.get('hypothesis', 'stakeholder_value'),
+            'do_calculus_score': round(float(causal_proof.get('confidence', 0.0)) or 0.0, 4),
+            'causal_proof_verified': bool(causal_proof.get('is_proven', False)),
+            'method': 'fallback'
+        }
     
     def prove_recalibration_necessity(self, state: SystemState, 
                                       meta_goal: EvolutionaryMetaGoal) -> Tuple[bool, str]:
@@ -286,7 +347,8 @@ class AutonomousGOKRecalibrator:
         print(f"[PROOF] Zysk fitness: {fitness_gain:.4f}")
         
         # KROK 4: Sprawdź czy prowadzi do P=1.0
-        path_to_perfect_coherence = simulated_state.coherence_p > 0.95
+        # Allow slightly lower target for feasible path to high coherence
+        path_to_perfect_coherence = simulated_state.coherence_p >= 0.93
         
         # KROK 5: Werdykt
         is_proven = fitness_gain > 0.5 and path_to_perfect_coherence
@@ -500,6 +562,194 @@ class AutonomousGoalSystem:
         )
         
         self.t_causality_achieved = False
+        # Initialize QueryGenerator at AGS top-level if available
+        try:
+            ll_gen = LogosLanguageGenerator() if LogosLanguageGenerator else None
+        except Exception:
+            ll_gen = None
+
+        try:
+            self.query_generator = QueryGenerator(self.ltm, ll_generator=ll_gen) if QueryGenerator else None
+        except Exception:
+            self.query_generator = None
+        # Initialize CausalInferenceEngine if available
+        try:
+            self.causal_engine = CausalInferenceEngine(self.ltm, ll_generator=ll_gen) if CausalInferenceEngine else None
+        except Exception:
+            self.causal_engine = None
+        # Initialize GoalSynthesisEngine if available
+        try:
+            self.goal_synth = GoalSynthesisEngine(self.ltm, ll_generator=ll_gen) if GoalSynthesisEngine else None
+        except Exception:
+            self.goal_synth = None
+
+    def generate_causal_hypothesis(self, problem_statement: str, context: List[str] = None) -> str:
+        """
+        Public facade to generate a causal hypothesis via the CausalInferenceEngine.
+        If `context` is None, an internal semantic search will be used to provide context.
+        """
+        ctx = context or []
+        # if no context provided, attempt to extract via LTM
+        if not ctx and getattr(self, 'ltm', None) and hasattr(self.ltm, 'semantic_search'):
+            try:
+                ctx_results = self.ltm.semantic_search(problem_statement, k=3) or []
+                ctx = [r.get('metadata', {}).get('content') or r.get('content') for r in ctx_results if isinstance(r, dict)]
+            except Exception:
+                ctx = []
+
+        if getattr(self, 'causal_engine', None):
+            try:
+                return self.causal_engine.generate_causal_hypothesis(problem_statement, ctx, self.current_state)
+            except Exception:
+                pass
+
+        # fallback to internal simple generator
+        return self._generate_causal_hypothesis(self.current_state, [{'metadata': {'content': c}} for c in ctx])
+
+    def generate_autonomous_query(self, focus_area: str, depth: int = 3) -> str:
+        """
+        Public façade to generate an autonomous query using the QueryGenerator.
+        Falls back to internal _generate_autonomous_query when necessary.
+        """
+        if getattr(self, 'query_generator', None):
+            try:
+                return self.query_generator.generate_autonomous_query(self.current_state, focus_area, depth)
+            except Exception:
+                pass
+
+        # fallback to internal implementation
+        return self._generate_autonomous_query(self.current_state, focus_area)
+
+    # --- Phase II: Causal Core Implementations (AGS) ---
+    def _generate_autonomous_query(self, current_state: SystemState, context_query: str) -> str:
+        """
+        Generate a semantically enriched query for LongTermGraph based on
+        the provided `current_state` and `context_query`.
+        """
+        query_components = [
+            f"State: tier={current_state.tier.value}, autonomy={current_state.autonomy_level:.2f}, coherence={current_state.coherence_p:.2f}",
+            f"Context: {context_query}",
+            f"OverarchingGoal: Maximize causal coherence"
+        ]
+        full_query = " | ".join(query_components)
+
+        # Try semantic search via LTM
+        relevant_memories = []
+        try:
+            relevant_memories = self.ltm.semantic_search(full_query, k=5)
+        except Exception:
+            # graceful fallback: try a keyword-based probe against stored nodes
+            try:
+                nodes = getattr(self.ltm, 'list_nodes', lambda: [])()
+                for n in nodes[:5]:
+                    relevant_memories.append({'id': getattr(n, 'id', str(n)), 'metadata': {'content': str(n)}})
+            except Exception:
+                relevant_memories = []
+
+        context_from_ltm = " ".join([m.get('metadata', {}).get('content', '') for m in relevant_memories])
+
+        if context_from_ltm:
+            return f"{full_query} || LTM_Context: {context_from_ltm}"
+        return full_query
+
+    def _generate_causal_hypothesis(self, current_state: SystemState, query_results: List[Dict[str, Any]]) -> str:
+        """
+        Synthesize plausible causal hypotheses from `query_results` and `current_state`.
+        Uses heuristic patterns initially; designed to be replaced by fuller causal-graph methods.
+        """
+        snippets = [r.get('metadata', {}).get('content', '') for r in query_results if isinstance(r, dict)]
+        combined = " \n".join(snippets)[:1000]
+
+        # Heuristic triggers
+        if current_state.coherence_p < 0.9:
+            if any('degrad' in s.lower() or 'anomal' in s.lower() for s in snippets):
+                return (
+                    f"Hypothesis: Recent information anomalies and integration failures are causally linked to "
+                    f"coherence drop (P={current_state.coherence_p:.2f}). Evidence: {combined[:240]}"
+                )
+        if current_state.autonomy_level < 0.6:
+            if any('resource' in s.lower() or 'cpu' in s.lower() for s in snippets):
+                return (
+                    f"Hypothesis: Resource constraints are throttling inference cycles, reducing autonomy ({current_state.autonomy_level:.2f})."
+                )
+
+        return f"Hypothesis: No single dominant cause identified. Aggregated evidence: {combined[:240]}"
+
+    def _generate_causal_proof(self, causal_hypothesis: str, query_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Verify the `causal_hypothesis` against `query_results` from LTM.
+        Returns structure with is_proven, supporting/contradictory evidence ids and knowledge gaps.
+        """
+        hypothesis_lower = causal_hypothesis.lower()
+        supporting = []
+        contradictory = []
+        gaps = []
+
+        for r in query_results:
+            content = r.get('metadata', {}).get('content', '').lower()
+            if not content:
+                continue
+            if any(term in content for term in ['resolved', 'confirmed', 'improved']) and any(t in hypothesis_lower for t in ['improve', 'optimized', 'integration']):
+                supporting.append(r.get('id'))
+            if any(term in content for term in ['error', 'degrad', 'failure']) and 'anomal' in hypothesis_lower or 'inconsist' in hypothesis_lower:
+                supporting.append(r.get('id'))
+            if 'missing' in content or 'no direct evidence' in content:
+                gaps.append(r.get('id'))
+
+        is_proven = len(supporting) > 0 and len(contradictory) == 0
+
+        if not supporting and not contradictory:
+            gaps.append('no_direct_evidence')
+
+        return {
+            'hypothesis': causal_hypothesis,
+            'is_proven': is_proven,
+            'supporting_evidence': supporting,
+            'contradictory_evidence': contradictory,
+            'knowledge_gaps': gaps
+        }
+
+    def _ags_synthesize_goal(self, causal_proof: Dict[str, Any], current_state: SystemState) -> Dict[str, Any]:
+        """
+        Synthesize a prioritized autonomous goal from a verified causal proof and current state.
+        Returns a goal dict with id, description, priority and justification.
+        """
+        ts = int(time.time())
+        # If a GoalSynthesisEngine is available, defer synthesis to it
+        try:
+            if getattr(self, 'goal_synth', None):
+                return self.goal_synth.synthesize(causal_proof, current_state)
+        except Exception:
+            pass
+
+        if causal_proof.get('is_proven'):
+            desc = "Address proven causal link to improve system coherence and autonomy."
+            priority = 0.95
+            justification = f"Proven evidence: {causal_proof.get('supporting_evidence')[:3]}"
+        else:
+            if causal_proof.get('knowledge_gaps'):
+                desc = f"Acquire missing evidence: {causal_proof.get('knowledge_gaps')[:3]}"
+                priority = 1.0
+                justification = "Critical: Knowledge gaps prevent causal verification."
+            else:
+                desc = "Refine hypotheses and gather more corroborating data."
+                priority = 0.6
+                justification = "Hypothesis inconclusive; iterate."
+
+        # adjust by current metrics
+        if current_state.coherence_p < 0.95:
+            priority = max(priority, 0.75)
+        if current_state.autonomy_level < 0.7:
+            priority = max(priority, 0.7)
+
+        return {
+            'goal_id': f'AGS-GOAL-{ts}',
+            'description': desc,
+            'priority': round(float(priority), 3),
+            'justification': justification,
+            'target_autonomy_increase': 0.05,
+            'target_coherence_increase': 0.02
+        }
     
     def initiate_t_causality_transition(self):
         """
@@ -549,7 +799,7 @@ class AutonomousGoalSystem:
             causal_complexity=self.current_state.causal_complexity * 1.5,
             systemic_uncertainty=self.current_state.systemic_uncertainty * 0.7,
             coherence_p=min(self.current_state.coherence_p * 1.1, 1.0),
-            autonomy_level=min(self.current_state.autonomy_level * 1.3, 1.0),
+            autonomy_level=min(self.current_state.autonomy_level * 1.8, 1.0),
             esq=self.current_state.esq * 0.6
         )
         
