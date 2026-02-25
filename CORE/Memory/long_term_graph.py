@@ -153,5 +153,65 @@ class LongTermGraphManager:
             print(f"[MEMORY] Failed to load axioms: {e}")
             return False
 
+    # --- Semantic search + simple caching (T2 Phase IV profiling helper) ---
+    def _simple_embed(self, text):
+        """Placeholder embedder: deterministic lightweight embedding for tests.
+        Replace with real encoder (OpenAI/embedding model) in production.
+        """
+        vec = [float((ord(c) % 97) / 97.0) for c in text[:128]]
+        L = 32
+        if len(vec) < L:
+            vec = vec + [0.0] * (L - len(vec))
+        else:
+            vec = vec[:L]
+        return vec
+
+    def _cosine_sim(self, a, b):
+        """Compute cosine similarity for two equal-length vectors."""
+        sa = sum(x * x for x in a) ** 0.5
+        sb = sum(x * x for x in b) ** 0.5
+        if sa == 0 or sb == 0:
+            return 0.0
+        dot = sum(x * y for x, y in zip(a, b))
+        return dot / (sa * sb)
+
+    def semantic_search(self, query_text, top_k=5, use_cache=True, cache_ttl=300):
+        """Return top_k node_ids most semantically similar to `query_text`.
+
+        Lightweight implementation for testing. In production, delegate to
+        a proper embedder and vector DB. This includes an in-memory cache
+        with TTL to speed repeated queries during profiling.
+        """
+        if not hasattr(self, '_semantic_cache'):
+            self._semantic_cache = {}
+
+        cache_key = (query_text, top_k)
+        now = time.time()
+        if use_cache:
+            entry = self._semantic_cache.get(cache_key)
+            if entry is not None:
+                ts, value = entry
+                if now - ts < cache_ttl:
+                    return value
+
+        qvec = self._simple_embed(query_text)
+
+        scores = []
+        for node_id, emb in self.vector_store.items():
+            try:
+                sim = self._cosine_sim(qvec, emb)
+            except Exception:
+                sim = 0.0
+            scores.append((sim, node_id))
+
+        scores.sort(reverse=True)
+        result = [nid for _, nid in scores[:top_k]]
+
+        if use_cache:
+            self._semantic_cache[cache_key] = (now, result)
+
+        return result
+
+
 # Alias dla kompatybilności
-LongTermGraph = LongTermGraphManager 
+LongTermGraph = LongTermGraphManager
