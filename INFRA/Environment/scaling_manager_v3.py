@@ -455,6 +455,28 @@ class ScalingManager_v3:
             "delta_stabilized": self.delta_stabilized,
             "workbench_url": self.vertex_ai.get_workbench_endpoint()
         }
+
+    def verify_gcp_resources(self) -> Dict:
+        """Verify availability of key GCP resources (BigQuery, Vertex AI).
+
+        This is a lightweight simulator used by tests to assert infrastructure readiness.
+        If infrastructure is not yet initialized, attempt to initialize it.
+        Returns a dict with boolean flags expected by tests.
+        """
+        # If not initialized, attempt initialization (idempotent simulation)
+        if not self.resource_allocations:
+            initialized = self.initialize_gcp_infrastructure()
+        else:
+            initialized = True
+
+        bigquery_enabled = bool(self.resource_allocations and self.resource_allocations.bigquery_enabled)
+        vertex_ai_enabled = bool(self.vertex_ai and self.vertex_ai.api_initialized)
+
+        return {
+            'bigquery_enabled': bigquery_enabled,
+            'vertex_ai_enabled': vertex_ai_enabled,
+            'initialized': initialized
+        }
     
     def monitor_cost_and_quota(self) -> Dict:
         """Monitorowanie kosztów i kwot użycia w ramach budżetu Architekta."""
